@@ -873,7 +873,7 @@ function mailto(mail,r,msg){
   return"mailto:"+e(mail).replace(/%40/g,"@")+"?subject="+e(`LaboQCM - ${r.name} - ${r.cls} - Quiz ${r.quiz}`)+"&body="+e(msg);
 }
 /* ---------- Envoi automatique de la note vers la feuille Google Sheets du professeur (application web Apps Script) ---------- */
-const SHEET_URL="https://script.google.com/macros/s/AKfycby6kT10v_2ImO3cWL8AR6fhEYzR0DGGDlIh3r3eJ0zCCqp1J-QGd6tb2g1WisDGLuWnZg/exec";
+const SHEET_URL="https://script.google.com/macros/s/AKfycbz0qpNtFGsfGFpCA9rghXdgdyRiz817QWsddPGymDDSMvafukXE0zjKMXUgi7jrGfu3/exec";
 const canSend=()=>!!SHEET_URL&&!FRAMED;
 /* Un envoi. Google répond parfois par une page d'erreur alors que la note est bien enregistrée :
    on renvoie alors la même note, le script la reconnaît (pas de doublon) et confirme. */
@@ -888,7 +888,7 @@ async function sendGrade(done){
     if(k)await new Promise(ok=>setTimeout(ok,k*1500));
     let j=null;try{j=await postGrade(done.rec)}catch(e){}
     if(j&&j.ok){done.sent=true;LS.set("lq-done-"+done.rec.quiz,done);return true}
-    if(j&&j.error)break;
+    if(j&&j.error){const e=new Error(String(j.error));e.server=true;throw e}
   }
   throw new Error("envoi impossible");
 }
@@ -1032,20 +1032,21 @@ function examResult(done){
   document.getElementById("home").onclick=home;
   if(auto){
     const sst=document.getElementById("sst"),manual=document.getElementById("manual"),alt=document.getElementById("alt");
-    const show=state=>{
+    const show=(state,ex)=>{
       if(!sst.isConnected)return;
       if(state==="ok"){sst.innerHTML=`<p class="ok-text">✓ Ta note a été envoyée à ton professeur.</p>`;manual.hidden=true;alt.hidden=true}
       else if(state==="wait"){sst.innerHTML=`<p class="muted">Envoi de ta note à ton professeur…</p>`}
-      else{sst.innerHTML=`<p class="err">La note n'a pas pu être envoyée. Vérifie ta connexion Internet.</p><div class="row"><button class="small-btn" id="retry">Réessayer l'envoi</button></div>`;
+      else{sst.innerHTML=(ex&&ex.server?`<p class="err">La feuille du professeur a refusé la note : « ${esc(ex.message)} »</p>`:`<p class="err">La note n'a pas pu être envoyée. Vérifie ta connexion Internet.</p>`)+`<div class="row"><button class="small-btn" id="retry">Réessayer l'envoi</button></div>`;
         manual.hidden=false;alt.hidden=false;document.getElementById("retry").onclick=go}
     };
-    const go=()=>{show("wait");sendGrade(done).then(()=>show("ok"),()=>show("ko"))};
+    const go=()=>{show("wait");sendGrade(done).then(()=>show("ok"),ex=>show("ko",ex))};
     done.sent?show("ok"):go();
   }
 }
 
 /* ================= ESPACE PROFESSEUR ================= */
 let tLevel="3AC",tSel=[],confirmWipe=false,tMailDraft=null,tMailMsg="";
+let tSheetMsg="";
 let tCls=["3AC1","3AC2"],tDur="20",tDay=null,tT1=null,tT2=null,tView="3AC1",tQuiz="";
 const mailKey=()=>"lq-mail-"+profUser;
 /* Comptes professeurs : chaque prof crée son compte avec le code d'établissement.
@@ -1223,8 +1224,12 @@ function teacher(){
     </tbody></table></div>
     <div class="row"><button class="small-btn ghost" id="cptab">Copier la liste (Excel)</button></div>`
     :`<p class="muted">Aucune note pour la ${tView}. Ajoutez les notes ci-dessous : la liste des ${roster.length} élèves s'affichera avec la note de chacun, ou « absent ».</p>`}
-    <span class="label" style="margin-top:6px">Ajouter des notes</span>
-    <p class="muted">${canSend()?"Les notes arrivent automatiquement dans la feuille Google Sheets « Labo QCM - Notes ». Sélectionnez les lignes dans la feuille, copiez-les et collez-les ici. ":""}Vous pouvez aussi coller les messages « LaboQCM » envoyés par les élèves (e-mail ou WhatsApp).</p>
+    ${canSend()?`<span class="label" style="margin-top:6px">Notes de la feuille Google</span>
+    <div class="form"><div class="inline"><input id="skey" maxlength="40" autocapitalize="none" autocomplete="off" placeholder="clé de la feuille" value="${esc(LS.get("lq-skey","CSH2027"))}" aria-label="Clé de la feuille">
+      <button class="small-btn" type="button" id="sload">Charger les notes</button></div></div>
+    <div id="sstat" aria-live="polite">${tSheetMsg}</div>`:""}
+    <span class="label" style="margin-top:6px">Ajouter des notes à la main</span>
+    <p class="muted">${canSend()?"Vous pouvez coller des lignes copiées depuis la feuille Google. ":""}Vous pouvez aussi coller les messages « LaboQCM » envoyés par les élèves (e-mail ou WhatsApp).</p>
     <textarea id="paste" rows="4" placeholder="Collez ici les lignes de la feuille Google ou les messages LaboQCM"></textarea>
     <div class="row"><button class="small-btn" id="add">Ajouter les notes</button><span id="status" aria-live="polite"></span></div>
     ${extra.length?`<p class="muted">${extra.length} note${extra.length>1?"s":""} avec un nom absent des listes : ${extra.slice(0,5).map(g=>esc(g.name)).join(", ")}${extra.length>5?"…":""}</p>`:""}
@@ -1253,6 +1258,27 @@ function teacher(){
   const dm=byId("delmail");if(dm)dm.onclick=()=>{LS.del(mailKey());tMailDraft=null;tMailMsg=`<p class="ok-text">Adresse supprimée.</p>`;teacher()};
   byId("vcls").onchange=e=>{tView=e.target.value;tQuiz="";teacher()};
   const vq=byId("vquiz");if(quizzes.length)vq.onchange=e=>{tQuiz=e.target.value;teacher()};
+  tSheetMsg="";
+  const sl=byId("sload");if(sl)sl.onclick=async()=>{
+    const key=byId("skey").value.trim();LS.set("lq-skey",key);
+    byId("sstat").innerHTML=`<p class="muted">Chargement des notes…</p>`;
+    let j=null;try{const r=await fetch(SHEET_URL+"?cle="+encodeURIComponent(key));j=JSON.parse(await r.text())}catch(e){}
+    if(!j){byId("sstat").innerHTML=`<p class="err">La feuille ne répond pas. Vérifiez la connexion Internet.</p>`;return}
+    if(!j.ok||!Array.isArray(j.notes)){byId("sstat").innerHTML=`<p class="err">${esc(j.error==="clé incorrecte"?"Clé incorrecte : tapez la clé écrite dans le script de la feuille.":(j.error||"Réponse inattendue de la feuille."))}</p>`;return}
+    const all=LS.get(gradesKey(),[]);let added=0,last=null;
+    j.notes.forEach(x=>{
+      const r={name:String(x.name||""),cls:String(x.cls||""),quiz:String(x.quiz||""),score:+x.score,total:+x.total,date:String(x.date||""),sig:String(x.sig||"").toUpperCase()};
+      if(!r.name||!r.quiz||isNaN(r.score))return;
+      r.valid=sign(r)===r.sig;r.src="feuille";
+      if(!all.some(g=>g.quiz===r.quiz&&nkey(g.name)===nkey(r.name)&&(g.valid||!r.valid))){
+        const k=all.findIndex(g=>g.quiz===r.quiz&&nkey(g.name)===nkey(r.name));if(k>=0)all.splice(k,1);
+        all.push(r);added++;last=r}
+    });
+    LS.set(gradesKey(),all);
+    if(last){const f=findStudent(last.name,CLS);if(f){tView=f.cls;tQuiz=last.quiz}}
+    tSheetMsg=`<p class="ok-text">${j.notes.length} note${j.notes.length>1?"s":""} dans la feuille, ${added} nouvelle${added>1?"s":""}.</p>`;
+    teacher();
+  };
   byId("add").onclick=()=>{
     const lines=byId("paste").value.split(/\n+/).map(parseRow).filter(Boolean);
     if(!lines.length){byId("status").innerHTML=`<span class="err">Aucune note reconnue. Collez des lignes de la feuille Google (nom, code du quiz, note) ou des messages LaboQCM.</span>`;return}
