@@ -136,6 +136,13 @@ a.btn{text-decoration:none}
 .addr{font-weight:800;overflow-wrap:anywhere;user-select:all}
 .inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .inline input{flex:1 1 200px}
+.form select{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
+.form select:focus{outline:none;border-color:var(--c2)}
+.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.settings .field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.form .settings label{margin:0}
+.timer{align-self:center;font-family:var(--display);font-size:1.25rem;font-variant-numeric:tabular-nums;padding:4px 16px;border-radius:99px;background:var(--surface);border:2px solid var(--line)}
+.timer.low{border-color:var(--bad);color:var(--bad)}
 </style>
 
 <div class="app" id="app"></div>
@@ -784,17 +791,55 @@ function copyText(text,btn){
 function toQuestions(pool,n){return shuffle(pool).slice(0,n).map(({q,ch})=>({text:q[0],answer:q[1][0],opts:shuffle(q[1]),exp:q[2],ch}))}
 function poolOf(level,idx){const L=BANK[level];return idx.flatMap(i=>L.chapters[i].qs.map(q=>({q,ch:L.chapters[i].name})))}
 
-/* ---------- Codes de quiz : "3AC-ADF" = 3AC, leçons A, D et F (A = leçon 1) ---------- */
-const ABC="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const makeCode=(level,idx)=>level+"-"+idx.slice().sort((a,b)=>a-b).map(i=>ABC[i]).join("");
-function parseCode(c){
-  c=String(c||"").trim().toUpperCase().replace(/\s+/g,"");
-  const m=c.match(/^(3AC)-?([A-Z]+)$/);if(!m)return null;
-  const L=BANK[m[1]];const idx=[...new Set(m[2].split("").map(d=>ABC.indexOf(d)))].sort((a,b)=>a-b);
-  if(idx.some(i=>i>=L.chapters.length))return null;
-  const n=idx.reduce((t,i)=>t+L.chapters[i].qs.length,0);
-  return{level:m[1],idx,code:makeCode(m[1],idx),n};
+/* ---------- Listes des élèves (Massar), intégrées à l'application ---------- */
+const CLASSES={"3AC1": ["ARABI MALAK", "BARADI HOUSSAM", "BENADDI NOUR", "BENJELLOUN HASSAN", "BENJELLOUN HOUCINE", "BENTHAMI SOUFIANE", "BIHMANE HICHAM", "BOUCHOU FIRDAWS", "BOUNOUAR FATIMA ZAHRA", "CHAKOUK IBTISSAM", "CHERKAOUI DEQAQI ZAYNAB", "DRIDIR AFNANE", "DRISSI ASMAE", "EL ACHI SOUJOUD", "EL AMINE AYMAN", "EL ANKOUD IBTIHAL", "EL KOSTLI SARA", "EL MIMOUNI YAHYA", "ELKTIRI ADAM", "FARHANE HAITHAM", "GUELZIM MOHAMED", "JADDINE JIHANE", "KHARROUJ SAAD", "KORCHI MOHAMED", "LAGHRISSI YASMINE", "LALI RYAD", "LAMRI RIM", "MORCHID OUIJDANE", "NADEM LOUJAYNE", "OUAHIDI ADAM", "SIYATLI MOHAMED YASSER", "SMAKHO AKRAM"], "3AC2": ["ABOUCHOUAR ANAS", "ABOUK MOHAMED ISLAM", "ASRAOUI AMIRA", "ASRAOUI WARDA", "BABA GHITA", "BENABED FATIMA ZAHRA", "BENTHAMI SOULAF", "BRITEL GHITA", "CHAGHROUCHNI GHAYA", "CHAHBOUNE YAHYA", "DRISSI ZAINAB", "EL ATRASSI GHITA", "EL HOUDAIGUI MOHAMED", "EL IBRAHIMI MOHAMED AMINE", "EL YAMANI MOHAMED ZIAD", "FARIS ARWA", "FOUADI MARIAM", "HANSALI ADAM", "HILAL ADAM", "KASSIOUI ZAKARIA", "KCHIKACH OTHMANE", "LOKMANE MARAOUANE", "NKIRA ALAE", "OUADOU DINA", "REGRAGUI MOHAMED", "RHANNAM MALAK", "ROCHDY MOHAMED TAHA", "SABRI ALAE", "SID AHMED RAMI", "SLIMATI MALAK", "TOUIJRI AMJAD", "ZGUIDA SALMA"]};
+const CLS=Object.keys(CLASSES);
+const byId=id=>document.getElementById(id);
+/* Clé de comparaison des noms : sans accents, majuscules, ordre des mots indifférent */
+const nkey=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase().replace(/[^A-Z]+/g," ").trim().split(" ").filter(Boolean).sort().join(" ");
+function findStudent(name,classes){const k=nkey(name);if(!k)return null;for(const c of classes){const n=CLASSES[c].find(x=>nkey(x)===k);if(n)return{name:n,cls:c}}return null}
+
+/* ---------- Codes de quiz : 12 caractères (ex. 4K7Q-M2PD-R4X9) qui contiennent
+   les leçons, les classes, la durée, la date et la plage horaire, avec une clé de contrôle
+   (un code modifié à la main est refusé). ---------- */
+const B32="0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+const NB_LES=17;
+const DAY0=Date.UTC(2026,0,1);
+const p2=n=>String(n).padStart(2,"0");
+const hm=m=>p2(Math.floor(m/60))+":"+p2(m%60);
+const toMin=t=>{const m=/^(\d{1,2}):(\d{2})/.exec(t||"");return m?+m[1]*60+ +m[2]:NaN};
+const dayOf=iso=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||"");return m?Math.round((Date.UTC(+m[1],+m[2]-1,+m[3])-DAY0)/864e5):NaN};
+const isoOf=t=>{const d=new Date(t);return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())};
+const localAt=(day,min)=>{const d=new Date(DAY0+day*864e5);return new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate(),0,min).getTime()};
+const JOURS=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const dayLabel=day=>{const d=new Date(localAt(day,0));return JOURS[d.getDay()]+" "+p2(d.getDate())+"/"+p2(d.getMonth()+1)+"/"+d.getFullYear()};
+const chk=v=>parseInt(hash("qcm3ac|"+v.toString()),36)%64;
+const MASK=0x9E3779B97F4A7C1n&((1n<<60n)-1n);
+const fmtCode=s=>s.slice(0,4)+"-"+s.slice(4,8)+"-"+s.slice(8);
+function makeQuiz(o){
+  let v=0n;const put=(x,b)=>{v=(v<<BigInt(b))|BigInt(x)};
+  put(o.idx.reduce((m,i)=>m|(1<<i),0),NB_LES);
+  put(o.cls.reduce((m,c)=>m|(1<<CLS.indexOf(c)),0),2);
+  put(o.dur,7);put(o.day,10);put(o.start/5,9);put(o.end/5,9);
+  v=((v<<6n)|BigInt(chk(v)))^MASK;
+  let s="";for(let i=0;i<12;i++){s=B32[Number(v&31n)]+s;v>>=5n}
+  return fmtCode(s);
 }
+function parseCode(c){
+  const s=String(c||"").toUpperCase().replace(/[^0-9A-Z]/g,"").replace(/O/g,"0").replace(/[IL]/g,"1").replace(/U/g,"V");
+  if(s.length!==12)return null;
+  let v=0n;for(const ch of s){const k=B32.indexOf(ch);if(k<0)return null;v=(v<<5n)|BigInt(k)}
+  v^=MASK;const ck=Number(v&63n);v>>=6n;if(chk(v)!==ck)return null;
+  const get=b=>{const x=Number(v&((1n<<BigInt(b))-1n));v>>=BigInt(b);return x};
+  const end=get(9)*5,start=get(9)*5,day=get(10),dur=get(7),cm=get(2),lm=get(NB_LES);
+  const L=BANK["3AC"];
+  const idx=[];for(let i=0;i<NB_LES;i++)if(lm&(1<<i))idx.push(i);
+  const cls=CLS.filter((_,i)=>cm&(1<<i));
+  if(!idx.length||idx.some(i=>i>=L.chapters.length)||!cls.length||dur<1||end<=start)return null;
+  const n=idx.reduce((t,i)=>t+L.chapters[i].qs.length,0);
+  return{level:"3AC",idx,cls,dur,day,start,end,n,code:fmtCode(s),open:localAt(day,start),close:localAt(day,end)};
+}
+const quizInfo=q=>`${dayLabel(q.day)}, de ${hm(q.start)} à ${hm(q.end)} · durée ${q.dur} min · ${q.cls.join(", ")}`;
 /* ---------- Signature des résultats (empêche de modifier la note dans le message) ---------- */
 function hash(s){let h=2166136261;for(const ch of s){h^=ch.codePointAt(0);h=Math.imul(h,16777619)>>>0}
   let h2=h;for(const ch of s+SALT){h2^=ch.codePointAt(0);h2=Math.imul(h2,2654435761)>>>0}
@@ -856,21 +901,24 @@ function retryPending(){
 function nowStr(){const d=new Date(),p=n=>String(n).padStart(2,"0");return`${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`}
 
 /* ================= ACCUEIL ÉLÈVE ================= */
+let tick=null;const stopTick=()=>{if(tick){clearInterval(tick);tick=null}};
 function home(){
+  stopTick();
   const pre=readHash();
   const me=LS.get("lq-me",{name:"",cls:""});
   $app.style.setProperty("--lc","var(--c3)");
   $app.innerHTML=`
   <section class="board">
     <h1>QCM 3AC</h1>
-    <p>Physique-chimie · 3ème année collège. Écris ton nom et le code du quiz donné par ton professeur, puis réponds à ${QN} questions.</p>
+    <p>Physique-chimie · 3ème année collège. Écris le code donné par ton professeur, choisis ta classe et écris ton nom, puis réponds à ${QN} questions.</p>
     <div class="formula">ρ = m/V &nbsp; U = R·I</div>
   </section>
   <form class="card form" id="f" novalidate>
     <h2>Passer un quiz</h2>
-    <label for="nm">Nom et prénom</label><input id="nm" maxlength="40" autocomplete="name" value="${esc(me.name)}">
-    <label for="cl">Classe</label><input id="cl" maxlength="15" placeholder="exemple : 3AC-3" value="${esc(me.cls)}">
-    <label for="cd">Code du quiz</label><input id="cd" maxlength="32" placeholder="exemple : 3AC-ADF" autocapitalize="characters" value="${pre?pre.code:""}">
+    <label for="cd">Code du quiz</label><input id="cd" maxlength="20" placeholder="exemple : 4K7Q-M2PD-R4X9" autocapitalize="characters" autocomplete="off" spellcheck="false" value="${pre?pre.code:""}">
+    <div id="qinfo" aria-live="polite"></div>
+    <label for="cl">Classe</label><select id="cl"></select>
+    <label for="nm">Nom et prénom</label><input id="nm" maxlength="60" autocomplete="off" autocapitalize="characters" spellcheck="false" list="names" placeholder="comme sur Massar, exemple : ARABI MALAK" value="${esc(me.name)}"><datalist id="names"></datalist>
     <p class="err" id="err" hidden></p>
     <button class="btn" type="submit">Commencer le quiz</button>
     ${canSend()?`<p class="muted">À la fin du quiz, ton nom, ta classe et ta note sont envoyés à ton professeur.</p>`:""}
@@ -878,55 +926,92 @@ function home(){
   <button class="btn ghost" id="train">S'entraîner librement</button>
   <button class="link" id="prof">Espace professeur</button>
   ${FRAMED||!/^https?:$/.test(location.protocol)?"":`<a class="link" href="confidentialite.html">Confidentialité</a>`}`;
-  document.getElementById("train").onclick=practiceHome;
-  document.getElementById("prof").onclick=()=>teacher();
-  document.getElementById("f").onsubmit=e=>{
+  byId("train").onclick=practiceHome;
+  byId("prof").onclick=()=>teacher();
+  const cd=byId("cd"),cl=byId("cl"),nm=byId("nm"),info=byId("qinfo"),dl=byId("names"),err=byId("err");
+  const fill=()=>{
+    const q=parseCode(cd.value),list=q?q.cls:CLS,cur=cl.value||me.cls;
+    cl.innerHTML=(list.length>1?`<option value="">Choisis ta classe</option>`:"")+list.map(c=>`<option value="${c}"${c===cur?" selected":""}>${c}</option>`).join("");
+    dl.innerHTML=(CLASSES[cl.value]||[]).map(n=>`<option value="${esc(n)}"></option>`).join("");
+    if(!q){info.innerHTML=cd.value.replace(/[^0-9a-z]/gi,"").length>=12?`<p class="err">Code incorrect. Vérifie le code écrit par ton professeur.</p>`:"";return}
+    const now=Date.now();
+    const st=now<q.open?`<span class="pill ko">ouvre à ${hm(q.start)}</span>`:now>=q.close?`<span class="pill ko">fermé</span>`:`<span class="pill ok">ouvert</span>`;
+    info.innerHTML=`<p class="muted">Quiz du ${esc(quizInfo(q))} ${st}</p>`;
+  };
+  cd.oninput=fill;cl.onchange=()=>{err.hidden=true;fill()};
+  fill();
+  byId("f").onsubmit=e=>{
     e.preventDefault();
-    const name=clean(document.getElementById("nm").value),cls=clean(document.getElementById("cl").value),code=parseCode(document.getElementById("cd").value),err=document.getElementById("err");
     const fail=t=>{err.textContent=t;err.hidden=false};
-    if(name.length<2)return fail("Écris ton nom et ton prénom.");
-    if(!cls)return fail("Écris ta classe.");
-    if(!code)return fail("Ce code n'existe pas. Vérifie le code écrit par ton professeur (exemple : 2AC-ADF).");
-    LS.set("lq-me",{name,cls});
-    const done=LS.get("lq-done-"+code.code,null);
-    if(done&&norm(done.rec.name)===norm(name))return examResult(done);
+    const q=parseCode(cd.value);
+    if(!q)return fail("Ce code n'existe pas. Vérifie le code écrit par ton professeur (12 caractères, exemple : 4K7Q-M2PD-R4X9).");
+    if(!cl.value)return fail("Choisis ta classe.");
+    if(!q.cls.includes(cl.value))return fail(`Ce quiz n'est pas pour la ${cl.value}.`);
+    if(clean(nm.value).length<2)return fail("Écris ton nom et ton prénom.");
+    const stu=findStudent(nm.value,[cl.value]);
+    if(!stu)return fail(`Ce nom n'est pas dans la liste de la ${cl.value}. Écris ton nom comme sur Massar (exemple : ${CLASSES[cl.value][0]}), ou choisis-le dans les suggestions.`);
+    LS.set("lq-me",{name:stu.name,cls:stu.cls});
+    const done=LS.get("lq-done-"+q.code,null);
+    if(done&&nkey(done.rec.name)===nkey(stu.name))return examResult(done);
     let run=LS.get("lq-run",null);
-    if(!run||run.quiz!==code.code||norm(run.name)!==norm(name)){
-      run={name,cls,quiz:code.code,level:code.level,qs:toQuestions(poolOf(code.level,code.idx),QN),i:0,picks:[]};
-      LS.set("lq-run",run);
-    }
+    if(run&&run.quiz===q.code&&nkey(run.name)===nkey(stu.name))return examAsk(run);
+    const now=Date.now();
+    if(now<q.open)return fail(`Le quiz n'a pas encore commencé. Il ouvre le ${dayLabel(q.day)} à ${hm(q.start)}.`);
+    if(now>=q.close)return fail(`Le quiz est fermé depuis le ${dayLabel(q.day)} à ${hm(q.end)}.`);
+    run={name:stu.name,cls:stu.cls,quiz:q.code,level:"3AC",qs:toQuestions(poolOf("3AC",q.idx),QN),i:0,picks:[],start:now,deadline:Math.min(now+q.dur*60000,q.close)};
+    LS.set("lq-run",run);
     examAsk(run);
   };
 }
 
 /* ================= QUIZ NOTÉ ================= */
 function examAsk(run){
+  stopTick();
+  if(run.deadline&&Date.now()>=run.deadline)return finishRun(run,true);
   const q=run.qs[run.i],n=run.qs.length;setColor(run.level);let pick=null;
   $app.innerHTML=`
   <div class="top"><span class="count">${esc(run.name)}</span><div class="bar"><i style="width:${run.i/n*100}%"></i></div><span class="count">${run.i+1}/${n}</span></div>
-  <section class="question pop"><span class="tag">Quiz ${run.quiz} · ${esc(q.ch)}</span><div class="q">${esc(q.text)}</div></section>
+  ${run.deadline?`<div class="timer" id="tmr" role="timer" aria-live="off"></div>`:""}
+  <section class="question pop"><span class="tag">${esc(run.cls)} · ${esc(q.ch)}</span><div class="q">${esc(q.text)}</div></section>
   <div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="letter">${LETTERS[k]}</span><span>${esc(o)}</span></button>`).join("")}</div>
   <button class="btn" id="next" disabled>${run.i+1<n?"Valider et continuer":"Valider et terminer"}</button>
-  <p class="muted" style="text-align:center">Choisis une réponse. Tu ne pourras pas revenir en arrière.</p>`;
-  const btns=[...$app.querySelectorAll(".opt")],next=document.getElementById("next");
+  <p class="muted" style="text-align:center">Choisis une réponse. Tu ne pourras pas revenir en arrière.${run.deadline?" Quand le temps est fini, le quiz est envoyé automatiquement.":""}</p>`;
+  const btns=[...$app.querySelectorAll(".opt")],next=byId("next");
+  if(run.deadline){
+    const tmr=byId("tmr");
+    const upd=()=>{
+      const left=run.deadline-Date.now();
+      if(left<=0){stopTick();return finishRun(run,true)}
+      const s=Math.ceil(left/1000);
+      tmr.textContent=`Temps restant ${Math.floor(s/60)}:${p2(s%60)}`;
+      tmr.classList.toggle("low",s<=60);
+    };
+    upd();tick=setInterval(upd,1000);
+  }
   btns.forEach(b=>b.onclick=()=>{pick=+b.dataset.k;btns.forEach(x=>x.classList.toggle("sel",x===b));next.disabled=false});
   next.onclick=()=>{
     if(pick==null)return;
     run.picks[run.i]=q.opts[pick];run.i++;LS.set("lq-run",run);
     if(run.i<n)return examAsk(run);
-    const score=run.qs.filter((x,k)=>x.answer===run.picks[k]).length;
-    const rec={name:run.name,cls:run.cls,quiz:run.quiz,score,total:n,date:nowStr()};rec.sig=sign(rec);
-    const done={rec,level:run.level,qs:run.qs,picks:run.picks,mail:LS.get("lq-tmail",""),auto:canSend()};
-    LS.set("lq-done-"+run.quiz,done);LS.del("lq-run");examResult(done);
+    finishRun(run,false);
   };
 }
+function finishRun(run,timeout){
+  stopTick();
+  const n=run.qs.length;
+  const score=run.qs.filter((x,k)=>x.answer===run.picks[k]).length;
+  const rec={name:run.name,cls:run.cls,quiz:run.quiz,score,total:n,date:nowStr()};rec.sig=sign(rec);
+  const done={rec,level:run.level,qs:run.qs,picks:run.picks,mail:LS.get("lq-tmail",""),auto:canSend(),timeout:!!timeout};
+  LS.set("lq-done-"+run.quiz,done);LS.del("lq-run");examResult(done);
+}
 function examResult(done){
+  stopTick();
   const r=done.rec,s=starsOf(r.score/r.total),msg=message(r);setColor(done.level);
   const tm=[done.mail,LS.get("lq-tmail","")].find(validMail)||"";
   const auto=canSend()&&(done.auto||done.sent);
   $app.innerHTML=`
   <section class="board result"><span class="label" style="color:var(--boardink);opacity:.85">${esc(r.name)} · ${esc(r.cls)} · Quiz ${r.quiz}</span>
-    <div class="big">${r.score}/${r.total}</div><div class="stars">${starsHTML(s)}</div><p>Terminé le ${esc(r.date)}</p></section>
+    <div class="big">${r.score}/${r.total}</div><div class="stars">${starsHTML(s)}</div><p>${done.timeout?"Temps écoulé : le quiz a été terminé automatiquement. ":""}Terminé le ${esc(r.date)}</p></section>
   <div class="card"><h2 id="sh">${auto?"Ta note pour ton professeur":"Envoie ta note à ton professeur"}</h2>
     ${auto?`<div id="sst" aria-live="polite"></div><p class="muted" id="alt" hidden>Tu peux aussi envoyer ta note toi-même :</p>`:""}
     <div id="manual" style="display:contents"${auto?" hidden":""}>
@@ -940,7 +1025,7 @@ function examResult(done){
     <button class="small-btn" id="cp">Copier le message</button></div></div>
   <div class="label">Correction</div>
   <div class="review">${done.qs.map((q,k)=>{const ok=q.answer===done.picks[k];return`<div class="corr ${ok?"":"wrong"}"><b>${k+1}.</b> ${esc(q.text)}<br>
-    ${ok?`<span class="good">✓ ${esc(q.answer)}</span>`:`<span class="you">✗ Ta réponse : ${esc(done.picks[k])}</span><br><span class="good">✓ ${esc(q.answer)}</span>`}<br>${esc(q.exp)}</div>`}).join("")}</div>
+    ${ok?`<span class="good">✓ ${esc(q.answer)}</span>`:`<span class="you">✗ ${done.picks[k]==null?"Pas de réponse":"Ta réponse : "+esc(done.picks[k])}</span><br><span class="good">✓ ${esc(q.answer)}</span>`}<br>${esc(q.exp)}</div>`}).join("")}</div>
   <button class="btn ghost" id="home">Retour à l'accueil</button>`;
   document.getElementById("cp").onclick=e=>copyText(msg,e.currentTarget);
   if(tm)document.getElementById("cpm").onclick=e=>copyText(tm,e.currentTarget);
@@ -961,6 +1046,7 @@ function examResult(done){
 
 /* ================= ESPACE PROFESSEUR ================= */
 let tLevel="3AC",tSel=[],confirmWipe=false,tMailDraft=null,tMailMsg="";
+let tCls=["3AC1","3AC2"],tDur="20",tDay=null,tT1=null,tT2=null,tView="3AC1",tQuiz="";
 const mailKey=()=>"lq-mail-"+profUser;
 /* Comptes professeurs : chaque prof crée son compte avec le code d'établissement.
    Les comptes sont enregistrés sur l'appareil (empreinte SHA-256 salée, jamais le mot de passe). */
@@ -1032,32 +1118,89 @@ function login(){
   };
 }
 function logout(){profUser=null;tMailDraft=null;tMailMsg="";try{sessionStorage.removeItem("lq-prof");localStorage.removeItem("lq-prof")}catch(e){}home()}
+function quizDefaults(){
+  if(tDay)return;
+  const d=new Date();let m=d.getHours()*60+d.getMinutes();m=Math.ceil(m/5)*5;
+  if(m>=23*60)m=8*60;
+  tDay=isoOf(d.getTime());tT1=hm(m);tT2=hm(Math.min(m+60,23*60+55));
+}
+/* Lignes collées par le professeur : messages « LaboQCM » ou lignes copiées depuis la feuille Google */
+function parseRow(line){
+  const m=parseMessage(line);if(m)return m;
+  const cells=line.split(/\t|;|\s\|\s/).map(s=>s.trim()).filter(Boolean);
+  if(cells.length<3)return null;
+  let stu=null,quiz="",score=null,total=10,date="";
+  for(const c of cells){
+    if(!stu){const f=findStudent(c,CLS);if(f){stu=f;continue}}
+    if(!quiz){const q=parseCode(c);if(q){quiz=q.code;continue}}
+    const fr=c.match(/^(\d{1,2})\s*\/\s*(\d{1,2})$/);if(fr&&score==null){score=+fr[1];total=+fr[2];continue}
+    if(/^\d{1,2}$/.test(c)){if(score==null)score=+c;else total=+c;continue}
+    if(!date&&/\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}/.test(c))date=c;
+  }
+  if(!stu||!quiz||score==null||!total||score>total)return null;
+  return{name:stu.name,cls:stu.cls,quiz,score,total,date,sig:"",valid:true,src:"feuille"};
+}
 function teacher(){
+  stopTick();
   if(!profUser)return login();
+  quizDefaults();
   setColor(tLevel);
   const L=BANK[tLevel];
-  const code=tSel.length?makeCode(tLevel,tSel):null;
+  const dur=+tDur,day=dayOf(tDay),t1=Math.round(toMin(tT1)/5)*5,t2=Math.round(toMin(tT2)/5)*5;
+  let qerr="";
+  if(!tCls.length)qerr="Cochez au moins une classe.";
+  else if(!(dur>=1&&dur<=99))qerr="La durée doit être entre 1 et 99 minutes.";
+  else if(!(day>=0&&day<1024))qerr="Choisissez une date valide (à partir de 2026).";
+  else if(isNaN(t1)||isNaN(t2))qerr="Choisissez l'heure de début et l'heure de fin.";
+  else if(t2<=t1)qerr="L'heure de fin doit être après l'heure de début.";
+  const code=tSel.length&&!qerr?makeQuiz({idx:tSel,cls:tCls,dur,day,start:t1,end:t2}):null;
+  const qq=code?parseCode(code):null;
   const nAvail=tSel.reduce((t,i)=>t+L.chapters[i].qs.length,0);
-  const grades=LS.get(gradesKey(),[]).slice().sort((a,b)=>a.cls.localeCompare(b.cls)||a.name.localeCompare(b.name));
-  const valid=grades.filter(g=>g.valid);
+  const grades=LS.get(gradesKey(),[]);
   const tmail=LS.get(mailKey(),"");const draft=tMailDraft==null?tmail:tMailDraft;
   const link=code?quizLink(code,tmail):"";
-  const avg=valid.length?(valid.reduce((t,g)=>t+g.score/g.total*10,0)/valid.length).toFixed(1).replace(".",","):"–";
+  /* Notes par classe */
+  if(!CLS.includes(tView))tView=CLS[0];
+  const roster=CLASSES[tView];
+  const keys=new Set(roster.map(nkey));
+  const mine=grades.filter(g=>g.cls===tView||keys.has(nkey(g.name)));
+  const quizzes=[...new Set(mine.map(g=>g.quiz))].reverse();
+  if(!quizzes.includes(tQuiz))tQuiz=quizzes[0]||"";
+  const rows=roster.map((name,i)=>{
+    const k=nkey(name);
+    const gs=mine.filter(g=>g.quiz===tQuiz&&nkey(g.name)===k);
+    const g=gs.find(x=>x.valid)||gs[0]||null;
+    return{i:i+1,name,g};
+  });
+  const present=rows.filter(r=>r.g&&r.g.valid);
+  const avg=present.length?(present.reduce((t,r)=>t+r.g.score/r.g.total*10,0)/present.length).toFixed(1).replace(".",","):"–";
+  const qLabel=c=>{const p=parseCode(c);return p?`${c} · ${p.day>=0?dayLabel(p.day):""} ${hm(p.start)}`:c};
+  const extra=grades.filter(g=>!findStudent(g.name,CLS));
   $app.innerHTML=`
   <div class="top" style="justify-content:space-between"><button class="back" id="back">← Accueil</button><span class="row"><span class="count">${esc(profUser)}</span><button class="small-btn ghost" id="logout">Se déconnecter</button></span></div>
-  <section class="board"><h1>Espace professeur</h1><p>Choisissez les leçons pour créer un code de quiz. Chaque élève reçoit ${QN} questions tirées au hasard dans ces leçons.</p></section>
+  <section class="board"><h1>Espace professeur</h1><p>Choisissez les leçons, les classes, la durée et la plage horaire. Chaque élève reçoit ${QN} questions tirées au hasard dans ces leçons.</p></section>
   <div class="card">
     <h2>1. Créer un quiz</h2>
-    <div class="tabs">${Object.keys(BANK).map(k=>`<button class="tab" style="--lc:${BANK[k].color}" data-l="${k}" aria-selected="${k===tLevel}">${k}<small>${BANK[k].sub}</small></button>`).join("")}</div>
     ${L.sems.map((sn,s)=>{const ids=L.chapters.map((c,i)=>c.sem===s?i:-1).filter(i=>i>=0);const all=ids.every(i=>tSel.includes(i));return`
     <div class="row" style="justify-content:space-between"><span class="label">Semestre ${s+1} · ${esc(sn)}</span><button class="small-btn ghost semall" data-s="${s}">${all?"Tout décocher":"Tout cocher"}</button></div>
-    <div class="checks">${ids.map(i=>{const c=L.chapters[i];return`<label class="check"><input type="checkbox" id="ch-${tLevel}-${i}" data-i="${i}" ${tSel.includes(i)?"checked":""}><span>${i+1}. ${esc(c.name)}</span><small>${c.qs.length} q.</small></label>`}).join("")}</div>`}).join("")}
+    <div class="checks">${ids.map(i=>{const c=L.chapters[i];return`<label class="check"><input type="checkbox" class="lesck" id="ch-${tLevel}-${i}" data-i="${i}" ${tSel.includes(i)?"checked":""}><span>${i+1}. ${esc(c.name)}</span><small>${c.qs.length} q.</small></label>`}).join("")}</div>`}).join("")}
+    <span class="label">Classes</span>
+    <div class="checks">${CLS.map(c=>`<label class="check"><input type="checkbox" class="clsck" id="cls-${c}" data-c="${c}" ${tCls.includes(c)?"checked":""}><span>${c}</span><small>${CLASSES[c].length} élèves</small></label>`).join("")}</div>
+    <span class="label">Durée et plage horaire</span>
+    <div class="form settings">
+      <div class="field"><label for="qdur">Durée (minutes)</label><input id="qdur" type="number" inputmode="numeric" min="1" max="99" value="${esc(tDur)}"></div>
+      <div class="field"><label for="qday">Date</label><input id="qday" type="date" value="${esc(tDay)}"></div>
+      <div class="field"><label for="qt1">Ouverture</label><input id="qt1" type="time" step="300" value="${esc(tT1)}"></div>
+      <div class="field"><label for="qt2">Fermeture</label><input id="qt2" type="time" step="300" value="${esc(tT2)}"></div>
+    </div>
+    <p class="muted">L'élève peut commencer entre l'ouverture et la fermeture. Il a la durée choisie pour répondre, et le quiz s'arrête au plus tard à l'heure de fermeture.</p>
+    ${qerr?`<p class="err">${qerr}</p>`:""}
     ${code?`<div class="codebox"><div><div class="label" style="color:var(--boardink);opacity:.8">Code à donner aux élèves</div><div class="code">${code}</div></div><button class="small-btn" id="cpcode">Copier le code</button></div>
-      <p class="muted">${nAvail} questions disponibles.${nAvail<QN?` Attention : moins de ${QN}, chaque élève aura ${nAvail} questions. Cochez une autre leçon pour arriver à ${QN}.`:""} Écrivez le code au tableau, ou envoyez ce lien aux élèves : le code sera déjà rempli.</p>
+      <p class="muted"><b>${esc(quizInfo(qq))}</b><br>${nAvail} questions disponibles.${nAvail<QN?` Attention : moins de ${QN}, chaque élève aura ${nAvail} questions.`:""} Écrivez le code au tableau, ou envoyez ce lien aux élèves : le code sera déjà rempli.</p>
       <div class="msg" id="lnk">${esc(link)}</div>
       <div class="row"><button class="small-btn" id="cplink">Copier le lien du quiz</button></div>
-      <p class="muted">${tmail?`Les élèves qui ouvrent ce lien pourront vous envoyer leur note par e-mail à <b>${esc(tmail)}</b>.`:"Enregistrez votre e-mail à l'étape 2 : le lien permettra alors aux élèves de vous envoyer leur note par e-mail."}</p>`
-      :`<p class="muted">Cochez au moins une leçon pour obtenir le code.</p>`}
+      <p class="muted">Si vous changez une leçon, une classe, la durée ou l'horaire, le code change : donnez le nouveau code aux élèves.</p>`
+      :(!tSel.length?`<p class="muted">Cochez au moins une leçon pour obtenir le code.</p>`:"")}
   </div>
   <form class="card form" id="mf" novalidate>
     <h2>2. Recevoir les notes par e-mail</h2>
@@ -1066,55 +1209,64 @@ function teacher(){
     <div class="inline"><input id="tmail" type="email" inputmode="email" autocomplete="email" autocapitalize="none" maxlength="80" placeholder="exemple : prof@gmail.com" value="${esc(draft)}">
       <button class="small-btn" type="submit">Enregistrer</button>${tmail?`<button class="small-btn ghost" type="button" id="delmail">Supprimer</button>`:""}</div>
     <div id="mstatus" aria-live="polite">${tMailMsg}</div>
-    <p class="muted">${tmail?`Adresse enregistrée : <b>${esc(tmail)}</b>. Si vous la changez, renvoyez un nouveau lien aux élèves.`:"Aucune adresse enregistrée : les élèves copient leur message et vous l'envoient eux-mêmes."}</p>
   </form>
   <div class="card">
-    <h2>3. Notes des élèves</h2>
-    ${canSend()?`<p class="muted">Les notes des quiz arrivent automatiquement dans la feuille Google Sheets « Labo QCM - Notes », gérée par le responsable de l'application. Le tableau ci-dessous sert aux messages reçus à la main.</p>`:""}
-    <p class="muted">À la fin du quiz, chaque élève peut aussi vous envoyer un message qui commence par « LaboQCM » (par e-mail ou WhatsApp). Collez ici un ou plusieurs messages.</p>
-    <textarea id="paste" rows="4" placeholder="LaboQCM | Nom: … | Classe: … | Quiz: … | Note: …/10 | …"></textarea>
-    <div class="row"><button class="small-btn" id="add">Ajouter les notes</button><span id="status" aria-live="polite"></span></div>
-    ${grades.length?`
-    <div class="summary"><div><b>${grades.length}</b><span>élèves</span></div><div><b>${avg}</b><span>moyenne /10</span></div><div><b>${grades.length-valid.length}</b><span>messages refusés</span></div></div>
-    <div class="tablewrap"><table><thead><tr><th>Nom</th><th>Note</th><th>Classe</th><th>Quiz</th><th>Date</th><th>Contrôle</th></tr></thead><tbody>
-    ${grades.map(g=>`<tr><td>${esc(g.name)}</td><td><b>${g.score}/${g.total}</b></td><td>${esc(g.cls)}</td><td>${esc(g.quiz)}</td><td>${esc(g.date)}</td><td>${g.valid?`<span class="pill ok">valide</span>`:`<span class="pill ko">modifié</span>`}</td></tr>`).join("")}
+    <h2>3. Notes par classe</h2>
+    <div class="form settings">
+      <div class="field"><label for="vcls">Classe</label><select id="vcls">${CLS.map(c=>`<option value="${c}"${c===tView?" selected":""}>${c} (${CLASSES[c].length} élèves)</option>`).join("")}</select></div>
+      <div class="field"><label for="vquiz">Quiz</label><select id="vquiz"${quizzes.length?"":" disabled"}>${quizzes.length?quizzes.map(c=>`<option value="${esc(c)}"${c===tQuiz?" selected":""}>${esc(qLabel(c))}</option>`).join(""):`<option>Aucune note reçue</option>`}</select></div>
+    </div>
+    ${quizzes.length?`
+    <div class="summary"><div><b>${present.length}</b><span>ont répondu</span></div><div><b>${roster.length-present.length}</b><span>absents</span></div><div><b>${avg}</b><span>moyenne /10</span></div></div>
+    <div class="tablewrap"><table><thead><tr><th>N°</th><th>Nom</th><th>Note</th><th>Date</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td>${r.i}</td><td>${esc(r.name)}</td><td>${r.g?(r.g.valid?`<b>${r.g.score}/${r.g.total}</b>`:`<span class="pill ko">modifié</span>`):`<span class="pill ko">absent</span>`}</td><td>${r.g?esc(r.g.date||""):""}</td></tr>`).join("")}
     </tbody></table></div>
-    <div class="row"><button class="small-btn ghost" id="cptab">Copier le tableau (Excel)</button>
-      ${confirmWipe?`<span class="muted">Effacer toutes les notes ?</span><button class="small-btn danger" id="wipe2">Oui, effacer</button><button class="small-btn ghost" id="nowipe">Annuler</button>`:`<button class="small-btn ghost" id="wipe">Tout effacer</button>`}</div>
-    <p class="muted">« Modifié » veut dire que le message a été changé après le quiz (nom ou note) : la note n'est pas fiable. Les notes sont gardées seulement dans ce navigateur, sur cet appareil.</p>`
-    :`<p class="muted">Aucune note pour l'instant. Les notes ajoutées s'affichent ici dans un tableau, triées par classe.</p>`}
+    <div class="row"><button class="small-btn ghost" id="cptab">Copier la liste (Excel)</button></div>`
+    :`<p class="muted">Aucune note pour la ${tView}. Ajoutez les notes ci-dessous : la liste des ${roster.length} élèves s'affichera avec la note de chacun, ou « absent ».</p>`}
+    <span class="label" style="margin-top:6px">Ajouter des notes</span>
+    <p class="muted">${canSend()?"Les notes arrivent automatiquement dans la feuille Google Sheets « Labo QCM - Notes ». Sélectionnez les lignes dans la feuille, copiez-les et collez-les ici. ":""}Vous pouvez aussi coller les messages « LaboQCM » envoyés par les élèves (e-mail ou WhatsApp).</p>
+    <textarea id="paste" rows="4" placeholder="Collez ici les lignes de la feuille Google ou les messages LaboQCM"></textarea>
+    <div class="row"><button class="small-btn" id="add">Ajouter les notes</button><span id="status" aria-live="polite"></span></div>
+    ${extra.length?`<p class="muted">${extra.length} note${extra.length>1?"s":""} avec un nom absent des listes : ${extra.slice(0,5).map(g=>esc(g.name)).join(", ")}${extra.length>5?"…":""}</p>`:""}
+    ${grades.length?`<div class="row">${confirmWipe?`<span class="muted">Effacer toutes les notes ?</span><button class="small-btn danger" id="wipe2">Oui, effacer</button><button class="small-btn ghost" id="nowipe">Annuler</button>`:`<button class="small-btn ghost" id="wipe">Effacer toutes les notes</button>`}</div>`:""}
+    <p class="muted">« Modifié » veut dire que le message a été changé après le quiz : la note n'est pas fiable. Les notes ajoutées sont gardées sur cet appareil.</p>
   </div>`;
-  document.getElementById("back").onclick=home;
-  document.getElementById("logout").onclick=logout;
-  $app.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{if(b.dataset.l!==tLevel){tLevel=b.dataset.l;tSel=[]}teacher()});
+  byId("back").onclick=home;
+  byId("logout").onclick=logout;
   $app.querySelectorAll(".semall").forEach(b=>b.onclick=()=>{const s=+b.dataset.s;const ids=L.chapters.map((c,i)=>c.sem===s?i:-1).filter(i=>i>=0);const all=ids.every(i=>tSel.includes(i));tSel=all?tSel.filter(i=>!ids.includes(i)):[...new Set([...tSel,...ids])];teacher()});
-  $app.querySelectorAll(".check input").forEach(c=>c.onchange=()=>{const i=+c.dataset.i;tSel=c.checked?[...tSel,i]:tSel.filter(x=>x!==i);teacher()});
-  if(code){document.getElementById("cpcode").onclick=e=>copyText(code,e.currentTarget);
-    document.getElementById("cplink").onclick=e=>copyText(link,e.currentTarget)}
+  $app.querySelectorAll(".lesck").forEach(c=>c.onchange=()=>{const i=+c.dataset.i;tSel=c.checked?[...tSel,i]:tSel.filter(x=>x!==i);teacher()});
+  $app.querySelectorAll(".clsck").forEach(c=>c.onchange=()=>{const k=c.dataset.c;tCls=c.checked?CLS.filter(x=>x===k||tCls.includes(x)):tCls.filter(x=>x!==k);teacher()});
+  byId("qdur").onchange=e=>{tDur=e.target.value;teacher()};
+  byId("qday").onchange=e=>{tDay=e.target.value;teacher()};
+  byId("qt1").onchange=e=>{tT1=e.target.value;if(toMin(tT2)<=toMin(tT1))tT2=hm(Math.min(toMin(tT1)+60,23*60+55));teacher()};
+  byId("qt2").onchange=e=>{tT2=e.target.value;teacher()};
+  if(code){byId("cpcode").onclick=e=>copyText(code,e.currentTarget);
+    byId("cplink").onclick=e=>copyText(link,e.currentTarget)}
   tMailMsg="";
-  document.getElementById("tmail").oninput=e=>{tMailDraft=e.target.value};
-  document.getElementById("mf").onsubmit=e=>{
+  byId("tmail").oninput=e=>{tMailDraft=e.target.value};
+  byId("mf").onsubmit=e=>{
     e.preventDefault();
-    const m=document.getElementById("tmail").value.trim().toLowerCase();
-    if(!validMail(m)){document.getElementById("mstatus").innerHTML=`<p class="err">Cette adresse n'est pas valide. Exemple : prof@gmail.com</p>`;return}
+    const m=byId("tmail").value.trim().toLowerCase();
+    if(!validMail(m)){byId("mstatus").innerHTML=`<p class="err">Cette adresse n'est pas valide. Exemple : prof@gmail.com</p>`;return}
     LS.set(mailKey(),m);tMailDraft=null;tMailMsg=`<p class="ok-text">Adresse enregistrée. Envoyez le lien du quiz (étape 1) aux élèves.</p>`;teacher();
   };
-  const dm=document.getElementById("delmail");if(dm)dm.onclick=()=>{LS.del(mailKey());tMailDraft=null;tMailMsg=`<p class="ok-text">Adresse supprimée.</p>`;teacher()};
-  document.getElementById("add").onclick=()=>{
-    const lines=document.getElementById("paste").value.split(/\n+/).map(parseMessage).filter(Boolean);
-    const st=document.getElementById("status");
-    if(!lines.length){st.innerHTML=`<span class="err">Aucun message LaboQCM reconnu.</span>`;return}
+  const dm=byId("delmail");if(dm)dm.onclick=()=>{LS.del(mailKey());tMailDraft=null;tMailMsg=`<p class="ok-text">Adresse supprimée.</p>`;teacher()};
+  byId("vcls").onchange=e=>{tView=e.target.value;tQuiz="";teacher()};
+  const vq=byId("vquiz");if(quizzes.length)vq.onchange=e=>{tQuiz=e.target.value;teacher()};
+  byId("add").onclick=()=>{
+    const lines=byId("paste").value.split(/\n+/).map(parseRow).filter(Boolean);
+    if(!lines.length){byId("status").innerHTML=`<span class="err">Aucune note reconnue. Collez des lignes de la feuille Google (nom, code du quiz, note) ou des messages LaboQCM.</span>`;return}
     const all=LS.get(gradesKey(),[]);let added=0;
-    lines.forEach(r=>{if(!all.some(g=>g.sig===r.sig&&norm(g.name)===norm(r.name))){all.push(r);added++}});
-    LS.set(gradesKey(),all);teacher();
-    document.getElementById("status").innerHTML=`<span class="ok-text">${added} note${added>1?"s":""} ajoutée${added>1?"s":""}${lines.length-added?` (${lines.length-added} déjà présente${lines.length-added>1?"s":""})`:""}.</span>`;
+    lines.forEach(r=>{if(!all.some(g=>g.quiz===r.quiz&&nkey(g.name)===nkey(r.name))){all.push(r);added++}});
+    LS.set(gradesKey(),all);
+    const last=lines[lines.length-1];const f=findStudent(last.name,CLS);if(f){tView=f.cls;tQuiz=last.quiz}
+    teacher();
+    byId("status").innerHTML=`<span class="ok-text">${added} note${added>1?"s":""} ajoutée${added>1?"s":""}${lines.length-added?` (${lines.length-added} déjà présente${lines.length-added>1?"s":""})`:""}.</span>`;
   };
-  if(grades.length){
-    document.getElementById("cptab").onclick=e=>copyText(["Nom\tClasse\tQuiz\tNote\tSur\tDate\tContrôle",...grades.map(g=>[g.name,g.cls,g.quiz,g.score,g.total,g.date,g.valid?"valide":"modifié"].join("\t"))].join("\n"),e.currentTarget);
-    const w=document.getElementById("wipe");if(w)w.onclick=()=>{confirmWipe=true;teacher()};
-    const w2=document.getElementById("wipe2");if(w2)w2.onclick=()=>{LS.del(gradesKey());confirmWipe=false;teacher()};
-    const nw=document.getElementById("nowipe");if(nw)nw.onclick=()=>{confirmWipe=false;teacher()};
-  }
+  if(quizzes.length)byId("cptab").onclick=e=>copyText([`${tView}\tQuiz ${tQuiz}`,"N°\tNom\tNote /10",...rows.map(r=>[r.i,r.name,r.g?(r.g.valid?r.g.score:"modifié"):"absent"].join("\t"))].join("\n"),e.currentTarget);
+  const w=byId("wipe");if(w)w.onclick=()=>{confirmWipe=true;teacher()};
+  const w2=byId("wipe2");if(w2)w2.onclick=()=>{LS.del(gradesKey());confirmWipe=false;tQuiz="";teacher()};
+  const nw=byId("nowipe");if(nw)nw.onclick=()=>{confirmWipe=false;teacher()};
 }
 
 /* ================= ENTRAÎNEMENT LIBRE ================= */
@@ -1122,6 +1274,7 @@ let prefs=LS.get("laboqcm2",{best:{},done:0,level:"3AC"});if(!BANK[prefs.level])
 const savePrefs=()=>LS.set("laboqcm2",prefs);
 let quiz=null;
 function practiceHome(){
+  stopTick();
   const L=BANK[prefs.level];setColor(prefs.level);
   const bestMix=prefs.best[prefs.level+":mix"];
   $app.innerHTML=`
