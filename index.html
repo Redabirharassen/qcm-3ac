@@ -1,0 +1,1187 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>QCM 3AC</title>
+<meta name="description" content="QCM de physique-chimie pour la 3ème année collège (3AC) : 17 leçons, entraînement et quiz notés.">
+<meta name="theme-color" content="#22463d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2322463d'/%3E%3Ctext x='32' y='42' font-family='Arial' font-weight='700' font-size='22' text-anchor='middle' fill='%23f5df72'%3E3AC%3C/text%3E%3C/svg%3E">
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: une colonne type téléphone ; accueil = tableau noir + onglets de niveau + liste des leçons ; quiz = énoncé au tableau, réponses A–D empilées */
+:root{
+  --bg:#edf2f0; --surface:#ffffff; --ink:#1b2a26; --muted:#5a6d67; --line:#d2dcd8;
+  --board:#22463d; --boardink:#f2f6f3; --chalk:#f5df72; --good:#2e8b57; --bad:#c2453b;
+  --c1:#e3a93b; --c2:#4f9cc4; --c3:#d26f55;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121e1b; --surface:#1b2b27; --ink:#e8f0ed; --muted:#9db1aa; --line:#2e443e;
+  --board:#295449; --good:#5cc286; --bad:#ec7a6f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121e1b; --surface:#1b2b27; --ink:#e8f0ed; --muted:#9db1aa; --line:#2e443e;
+  --board:#295449; --good:#5cc286; --bad:#ec7a6f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding:16px;padding-block:16px 32px}
+.app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.15;text-wrap:balance}
+button{font:inherit}
+.board{background:var(--board);color:var(--boardink);border-radius:18px;padding:20px;position:relative;overflow:hidden}
+.board h1{font-size:2rem;color:var(--chalk)}
+.board p{margin:6px 0 0;opacity:.92;max-width:40ch}
+.board .formula{position:absolute;right:-6px;bottom:-18px;font-family:var(--display);font-size:3.6rem;color:#fff;opacity:.08;white-space:nowrap;pointer-events:none}
+.stats{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.13);border-radius:999px;padding:3px 12px;font-weight:700;font-size:.85rem;font-variant-numeric:tabular-nums}
+.label{font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.tabs:has(> .tab:only-child){display:none}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tab{all:unset;cursor:pointer;text-align:center;padding:10px 4px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-family:var(--display);font-size:1.25rem;line-height:1.1}
+.tab small{display:block;font-family:var(--body);font-size:.72rem;color:var(--muted);font-weight:700}
+.tab[aria-selected="true"]{background:var(--lc);border-color:var(--lc);color:#1b2a26}
+.tab[aria-selected="true"] small{color:#1b2a26}
+.tab:focus-visible,.lesson:focus-visible,.opt:focus-visible,.btn:focus-visible,.back:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
+.lessons{display:flex;flex-direction:column;gap:10px}
+.lesson{all:unset;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:12px 14px;transition:border-color .15s,transform .15s}
+.lesson:hover{border-color:var(--lc);transform:translateX(2px)}
+.lesson .num{width:40px;height:40px;border-radius:12px;background:var(--lc);color:#1b2a26;display:grid;place-items:center;font-family:var(--display);font-size:1.15rem}
+.lesson .txt{min-width:0}
+.lesson h3{font-size:1.08rem}
+.lesson small{color:var(--muted);font-size:.85rem}
+.lesson.mix{background:var(--board);border-color:var(--board);color:var(--boardink)}
+.lesson.mix small{color:var(--boardink);opacity:.8}
+.lesson.mix .num{background:var(--chalk)}
+.stars{color:var(--c1);letter-spacing:1px;white-space:nowrap}
+.stars .off{color:var(--line)}
+.lesson.mix .stars .off{color:rgba(255,255,255,.25)}
+/* quiz */
+.top{display:flex;align-items:center;gap:12px}
+.back{all:unset;cursor:pointer;font-weight:800;color:var(--muted);padding:6px 2px}
+.bar{flex:1;height:10px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--lc);transition:width .3s}
+.count{font-variant-numeric:tabular-nums;font-weight:800;color:var(--muted)}
+.question{background:var(--board);color:var(--boardink);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:8px}
+.question .tag{font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;opacity:.8;font-weight:800}
+.question .q{font-family:var(--display);font-size:clamp(1.25rem,5.2vw,1.6rem);color:var(--chalk);line-height:1.25;overflow-wrap:anywhere}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{all:unset;cursor:pointer;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:700;min-width:0}
+.opt span:last-child{min-width:0;overflow-wrap:anywhere}
+.opt .letter{width:34px;height:34px;border-radius:10px;background:var(--bg);display:grid;place-items:center;font-family:var(--display);color:var(--muted)}
+.opt:hover:not(:disabled){border-color:var(--lc)}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--surface))}
+.opt.ok .letter{background:var(--good);color:#fff}
+.opt.ko{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface))}
+.opt.ko .letter{background:var(--bad);color:#fff}
+.explain{border-radius:14px;padding:12px 14px;border:2px solid;font-size:.95rem}
+.explain.ok{border-color:var(--good)} .explain.ko{border-color:var(--bad)}
+.explain b{display:block;font-family:var(--display);font-size:1.1rem}
+.explain.ok b{color:var(--good)} .explain.ko b{color:var(--bad)}
+.btn{all:unset;cursor:pointer;text-align:center;background:var(--ink);color:var(--bg);padding:14px;border-radius:14px;font-family:var(--display);font-size:1.15rem}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.result{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+.result .big{font-family:var(--display);font-size:4rem;line-height:1;color:var(--chalk);font-variant-numeric:tabular-nums}
+.result .stars{font-size:2rem}
+.actions{display:grid;gap:10px}
+.review{display:flex;flex-direction:column;gap:8px}
+.miss{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--bad);border-radius:10px;padding:10px 12px;font-size:.92rem}
+.miss .good{color:var(--good);font-weight:800}
+.tip{border:1px dashed var(--line);border-radius:14px;padding:12px 14px;font-size:.88rem;color:var(--muted)}
+@keyframes pop{from{transform:scale(.97)}to{transform:scale(1)}}
+.pop{animation:pop .2s ease-out}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h2{font-size:1.3rem}
+.form label{font-weight:800;font-size:.9rem;margin-bottom:-6px}
+.form input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
+.form input:focus,textarea:focus{outline:none;border-color:var(--c2)}
+.err{color:var(--bad);font-weight:700;margin:0}
+.ok-text{color:var(--good);font-weight:700;margin:0}
+.muted{color:var(--muted);font-size:.9rem;margin:0}
+.link{all:unset;cursor:pointer;color:var(--muted);font-weight:700;text-decoration:underline;text-underline-offset:3px;text-align:center;padding:6px}
+.link:focus-visible{outline:3px solid var(--c2)}
+.opt.sel{border-color:var(--lc);background:color-mix(in srgb,var(--lc) 18%,var(--surface))}
+.opt.sel .letter{background:var(--lc);color:#1b2a26}
+.btn:disabled{opacity:.45;cursor:default}
+.checks{display:flex;flex-direction:column;gap:8px}
+.check{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border:2px solid var(--line);border-radius:12px;cursor:pointer}
+.check:has(input:checked){border-color:var(--lc);background:color-mix(in srgb,var(--lc) 12%,var(--surface))}
+.check input{width:20px;height:20px;accent-color:var(--board)}
+.check small{color:var(--muted);white-space:nowrap}
+.codebox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--board);color:var(--boardink);border-radius:14px;padding:14px 16px}
+.codebox .code{font-family:var(--display);font-size:2rem;color:var(--chalk);letter-spacing:.04em;line-height:1}
+.small-btn{all:unset;cursor:pointer;font-weight:800;font-size:.9rem;padding:8px 14px;border-radius:10px;background:var(--ink);color:var(--bg);text-align:center}
+.codebox .small-btn{background:var(--chalk);color:#1b2a26}
+.small-btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.small-btn.danger{background:var(--bad);color:#fff}
+.small-btn:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.msg{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:10px;overflow-wrap:anywhere;user-select:all}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font-size:.75rem;font-weight:800;padding:2px 8px;border-radius:99px}
+.pill.ok{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.pill.ko{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.summary div{background:var(--bg);border-radius:12px;padding:10px;text-align:center}
+.summary b{display:block;font-family:var(--display);font-size:1.5rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.summary span{font-size:.75rem;color:var(--muted);font-weight:700}
+.corr{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--good);border-radius:10px;padding:10px 12px;font-size:.92rem}
+.corr.wrong{border-left-color:var(--bad)}
+.corr .you{color:var(--bad);font-weight:800}
+.corr .good{color:var(--good);font-weight:800}
+a.btn{text-decoration:none}
+.addr{font-weight:800;overflow-wrap:anywhere;user-select:all}
+.inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inline input{flex:1 1 200px}
+</style>
+
+<div class="app" id="app"></div>
+
+<script>
+/* Banque de questions : [énoncé, [bonne réponse, distracteur, distracteur, distracteur], explication] */
+const BANK={
+"3AC":{color:"var(--c3)",sub:"3ème année",sems:["Chimie : la matière","Mécanique et électricité"],chapters:[
+{sem:0,name:"Quelques matériaux utilisés au quotidien",qs:[
+["On appelle matériau :",["toute matière utilisée pour fabriquer des objets","tout objet fabriqué dans une usine","tout liquide utilisé au laboratoire","toute source d'énergie"],"Un matériau est la matière qui sert à fabriquer un objet : le verre, le fer, le plastique…"],
+["Les trois grandes familles de matériaux sont :",["métalliques, organiques et céramiques","solides, liquides et gazeux","acides, basiques et neutres","naturels, colorés et électriques"],"Métaux (fer, cuivre…), matériaux organiques (bois, plastiques…) et céramiques (verre, porcelaine…)."],
+["Le verre appartient à la famille des matériaux :",["céramiques","métalliques","organiques","magnétiques"],"Le verre, la terre cuite, la porcelaine et le marbre sont des matériaux céramiques."],
+["Les matières plastiques appartiennent à la famille des matériaux :",["organiques","céramiques","métalliques","minéraux"],"Les matériaux organiques sont d'origine naturelle (laine, bois, papier) ou industrielle (plastiques)."],
+["Lequel de ces matériaux est une céramique ?",["la porcelaine","le coton","le zinc","le polystyrène"],"Le coton et le polystyrène sont organiques ; le zinc est un métal."],
+["Lequel de ces matériaux organiques est d'origine naturelle ?",["la laine","le PVC","le nylon","le polystyrène"],"La laine vient des moutons ; les trois autres sont fabriqués par l'industrie."],
+["Une bouteille en verre : quel est l'objet et quel est le matériau ?",["la bouteille est l'objet, le verre est le matériau","le verre est l'objet, la bouteille est le matériau","les deux sont des objets","les deux sont des matériaux"],"L'objet est ce qu'on fabrique ; le matériau est la matière utilisée."],
+["Lequel de ces mots désigne un matériau et non un objet ?",["le cuivre","la casserole","la fenêtre","le téléphone"],"La casserole, la fenêtre et le téléphone sont des objets fabriqués avec des matériaux."],
+["Un téléphone portable est fabriqué :",["avec plusieurs matériaux : verre, plastique, métaux","avec un seul matériau","uniquement avec du verre","uniquement avec du cuivre"],"Un objet peut être fabriqué avec différents matériaux."],
+["Le seul métal liquide à température ordinaire est :",["le mercure","le plomb","l'étain","le zinc"],"Tous les autres métaux usuels sont solides à température ordinaire."],
+["Le symbole chimique du fer est :",["Fe","F","Fr","Fa"],"F est le fluor ; le fer se note Fe."],
+["Le symbole chimique du cuivre est :",["Cu","C","Co","Cr"],"C est le carbone, Co le cobalt, Cr le chrome."],
+["Le symbole chimique de l'aluminium est :",["Al","A","Am","Au"],"Au est le symbole de l'or."],
+["Le symbole Au désigne :",["l'or","l'argent","l'aluminium","le cuivre"],"Au vient du mot latin aurum. L'argent se note Ag."],
+["Le symbole chimique du zinc est :",["Zn","Z","Zi","Zc"],"Le zinc se note Zn."],
+["Une propriété commune à tous les métaux est :",["ils conduisent le courant électrique","ils sont attirés par un aimant","ils sont transparents","ils flottent sur l'eau"],"Tous les métaux conduisent l'électricité, mais seuls quelques-uns sont attirés par l'aimant."],
+["L'éclat métallique signifie que les métaux purs :",["brillent : ils réfléchissent la lumière","produisent leur propre lumière","sont transparents","changent de couleur à la chaleur"],"Un métal poli réfléchit la lumière, c'est pourquoi il brille."],
+["Le fond des casseroles est en métal car les métaux :",["conduisent bien la chaleur","isolent de la chaleur","sont transparents","fondent facilement"],"La conduction thermique est une propriété commune aux métaux."],
+["On dit que les métaux sont malléables car :",["on peut les déformer sans les casser","ils cassent au moindre choc","ils fondent dans la main","ils se dissolvent dans l'eau"],"On peut les aplatir en feuilles ou les étirer en fils."],
+["Les fils électriques sont le plus souvent en :",["cuivre","verre","PVC","porcelaine"],"Le cuivre est un très bon conducteur ; le PVC sert seulement de gaine isolante."],
+["Le bronze est un alliage de :",["cuivre et étain","cuivre et zinc","fer et carbone","or et argent"],"Bronze = environ 80 % de cuivre + 20 % d'étain."],
+["Le laiton est un alliage de :",["cuivre et zinc","cuivre et étain","fer et nickel","aluminium et plomb"],"Laiton = environ 60 % de cuivre + 40 % de zinc."],
+["Un alliage est :",["un mélange d'un métal avec un ou plusieurs autres éléments","un métal pur","une matière plastique","un verre coloré"],"L'acier, le laiton et le bronze sont des alliages."],
+["Le verre est formé essentiellement de silice, qui se trouve dans :",["le sable","le pétrole","le bois","le minerai de fer"],"On fabrique le verre en chauffant le sable à très haute température."],
+["La formule chimique de la silice est :",["SiO₂","CO₂","Al₂O₃","H₂O"],"La silice est le dioxyde de silicium SiO₂."],
+["Le verre est un matériau :",["transparent et isolant électrique","conducteur électrique","attiré par l'aimant","qui se déforme à la main"],"Il est aussi imperméable aux gaz et aux liquides, et recyclable."],
+["Le principal inconvénient du verre est :",["il est fragile : il casse lors d'un choc","il rouille à l'air humide","il conduit le courant","il laisse passer les liquides"],"Le verre résiste aux produits chimiques mais pas aux chocs."],
+["Les matières plastiques sont fabriquées par l'industrie à partir :",["du pétrole","du sable","du minerai de fer","de l'eau de mer"],"C'est l'industrie pétrochimique qui produit les plastiques."],
+["Les matières plastiques sont en général :",["légères et isolantes électriques","lourdes et conductrices","attirées par l'aimant","fragiles comme le verre"],"Elles sont aussi imperméables et résistent à de nombreux produits chimiques."],
+["Un inconvénient des matières plastiques est :",["elles s'enflamment et se déforment facilement à la chaleur","elles rouillent à l'air","elles conduisent le courant","elles se dissolvent dans l'eau"],"C'est pourquoi on ne pose pas un récipient en plastique sur le feu."],
+["Le sigle PVC signifie :",["polychlorure de vinyle","polyéthylène","polypropylène","polystyrène"],"Le PVC sert à fabriquer des tubes et des gaines."],
+["Le sigle PET signifie :",["polyéthylène téréphtalate","polychlorure de vinyle","polystyrène","polypropylène"],"Le PET porte le numéro 1 dans le triangle de recyclage."],
+["Les bouteilles d'eau minérale sont en général en :",["PET","PVC","PS","PP"],"Le PET est transparent, léger et solide."],
+["Le plastique qui brûle avec une flamme verte est :",["le PVC","le PET","le PE","le PS"],"La flamme verte est le test de reconnaissance du PVC, qui contient du chlore."],
+["Le plastique qui se dissout dans l'acétone est :",["le polystyrène (PS)","le polyéthylène (PE)","le PVC","le PET"],"C'est le test de reconnaissance du polystyrène."],
+["Le plastique qui s'enroule sous l'effet de la chaleur est :",["le PET","le PVC","le PS","le PP"],"Un morceau de PET plongé dans l'eau bouillante se rétracte et s'enroule."],
+["D'après les tests du cours, le plastique qui flotte sur l'eau douce est :",["le polyéthylène (PE)","le PVC","le PET","le PS"],"Le PE est moins dense que l'eau ; le PVC, le PET et le PS coulent dans l'eau douce."],
+["Le numéro écrit dans le triangle de recyclage d'un objet en plastique indique :",["le type de plastique","le prix de l'objet","la masse de l'objet","l'année de fabrication"],"Par exemple 1 pour le PET, 3 pour le PVC, 6 pour le PS."],
+["Le métal reconnaissable à sa couleur rouge brique est :",["le cuivre","le fer","le zinc","l'aluminium"],"L'or, lui, est jaune brillant."],
+["Parmi ces métaux, lequel est attiré par un aimant ?",["le fer","le cuivre","l'aluminium","le zinc"],"Le fer, le nickel et le cobalt sont attirés par l'aimant."],
+["Deux métaux gris ne sont pas attirés par l'aimant. Pour les distinguer, on compare :",["leur masse volumique","leur éclat","leur conduction électrique","leur température"],"Par exemple l'aluminium (2,7 g/cm³) est beaucoup moins dense que le zinc ou le fer."],
+["Un objet gris de masse 27 g a un volume de 10 cm³. Il est en :",["aluminium (ρ = 2,7 g/cm³)","fer (ρ = 7,8 g/cm³)","cuivre (ρ = 8,9 g/cm³)","or (ρ = 19,3 g/cm³)"],"ρ = m / V = 27 / 10 = 2,7 g/cm³."],
+["Un cube de fer a un volume de 10 cm³ (ρ = 7,8 g/cm³). Sa masse est :",["78 g","7,8 g","0,78 g","17,8 g"],"m = ρ × V = 7,8 × 10 = 78 g."]]},
+{sem:0,name:"Les atomes et les ions",qs:[
+["Un atome est constitué :",["d'un noyau et d'électrons","de molécules","d'un noyau seulement","d'ions et de molécules"],"Les électrons tournent autour du noyau, situé au centre de l'atome."],
+["Le noyau de l'atome porte des charges électriques :",["positives","négatives","nulles","tantôt positives, tantôt négatives"],"Les électrons, eux, portent des charges négatives."],
+["Chaque électron porte une charge électrique :",["négative, notée −e","positive, notée +e","nulle","égale à celle du noyau"],"e est la charge élémentaire."],
+["La charge élémentaire e vaut :",["1,6 × 10⁻¹⁹ C","1,6 × 10¹⁹ C","9,1 × 10⁻³¹ C","6,02 × 10²³ C"],"C'est la plus petite charge électrique."],
+["L'unité internationale de la charge électrique est :",["le coulomb (C)","l'ampère (A)","le volt (V)","le newton (N)"],"Son symbole est C."],
+["Le numéro atomique Z d'un atome est :",["le nombre de charges positives de son noyau","sa masse en grammes","son diamètre en nanomètres","le nombre de ses molécules"],"Z est aussi le nombre d'électrons de l'atome."],
+["Un atome est électriquement :",["neutre","positif","négatif","positif ou négatif selon le métal"],"Il a autant de charges positives dans le noyau que d'électrons."],
+["La masse d'un atome est pratiquement égale à :",["la masse de son noyau","la masse de ses électrons","zéro","la masse d'une molécule"],"La masse des électrons est négligeable devant celle du noyau."],
+["Le diamètre du noyau est :",["beaucoup plus petit que celui de l'atome","égal à celui de l'atome","plus grand que celui de l'atome","la moitié de celui de l'atome"],"L'atome est surtout formé de vide."],
+["Pour exprimer les dimensions des atomes, on utilise :",["le nanomètre (nm)","le kilomètre (km)","le mètre (m)","le centimètre (cm)"],"Les atomes sont extrêmement petits."],
+["1 nm est égal à :",["10⁻⁹ m","10⁻³ m","10⁹ m","10⁻⁶ m"],"Un nanomètre est un milliardième de mètre."],
+["Les électrons de tous les atomes sont :",["identiques","différents d'un atome à l'autre","positifs dans les métaux","immobiles"],"Seul leur nombre change d'un atome à l'autre."],
+["L'atome de carbone a pour numéro atomique Z = 6. Il possède :",["6 électrons","12 électrons","3 électrons","6 noyaux"],"Le nombre d'électrons d'un atome est égal à Z."],
+["L'atome d'aluminium a Z = 13. La charge de son noyau est :",["+13e","−13e","0","+26e"],"Le noyau porte Z charges positives."],
+["L'atome de cuivre a Z = 29. La charge de l'ensemble de ses électrons est :",["−29e","+29e","0","−58e"],"Il a 29 électrons, chacun de charge −e."],
+["L'atome de fer a Z = 26. Sa charge totale est :",["0","+26e","−26e","+52e"],"(+26e) + (−26e) = 0 : l'atome est neutre."],
+["Un ion provient d'un atome (ou d'un groupe d'atomes) qui a :",["perdu ou gagné un ou plusieurs électrons","perdu son noyau","gagné des charges positives dans son noyau","changé de masse"],"Le noyau ne change pas : seuls les électrons sont perdus ou gagnés."],
+["Un cation est :",["un ion positif","un ion négatif","un atome neutre","une molécule"],"Il provient d'un atome qui a perdu un ou plusieurs électrons."],
+["Un anion est :",["un ion négatif","un ion positif","un atome neutre","un noyau"],"Il provient d'un atome qui a gagné un ou plusieurs électrons."],
+["Un atome qui perd des électrons devient :",["un ion positif (cation)","un ion négatif (anion)","une molécule","un autre atome"],"Il lui reste plus de charges positives que de charges négatives."],
+["Un atome qui gagne des électrons devient :",["un ion négatif (anion)","un ion positif (cation)","un atome plus lourd","un noyau"],"Il a alors un excès de charges négatives."],
+["L'ion chlorure Cl⁻ provient d'un atome de chlore qui a :",["gagné 1 électron","perdu 1 électron","gagné 1 charge positive","perdu son noyau"],"Le signe − indique un électron en plus."],
+["L'ion aluminium Al³⁺ provient d'un atome d'aluminium qui a :",["perdu 3 électrons","gagné 3 électrons","perdu 3 noyaux","gagné 3 charges positives"],"3+ signifie trois électrons en moins."],
+["L'atome de chlore a Z = 17. L'ion Cl⁻ possède :",["18 électrons","17 électrons","16 électrons","1 électron"],"17 + 1 = 18 électrons."],
+["L'atome d'aluminium a Z = 13. L'ion Al³⁺ possède :",["10 électrons","13 électrons","16 électrons","3 électrons"],"13 − 3 = 10 électrons."],
+["L'atome de fer a Z = 26. L'ion Fe²⁺ possède :",["24 électrons","26 électrons","28 électrons","2 électrons"],"26 − 2 = 24 électrons."],
+["L'atome de cuivre a Z = 29. L'ion Cu²⁺ possède :",["27 électrons","29 électrons","31 électrons","2 électrons"],"29 − 2 = 27 électrons."],
+["L'atome d'oxygène a Z = 8. L'ion oxyde O²⁻ possède :",["10 électrons","8 électrons","6 électrons","2 électrons"],"8 + 2 = 10 électrons."],
+["Quand un atome se transforme en ion, la charge de son noyau :",["ne change pas","augmente","diminue","devient nulle"],"Le noyau de l'ion Al³⁺ porte toujours la charge +13e."],
+["La charge de l'ion Al³⁺ est :",["+3e","−3e","+13e","−10e"],"(+13e) + (−10e) = +3e."],
+["La charge de l'ion sulfate SO₄²⁻ est :",["−2e","+2e","−4e","+4e"],"Le 2− en haut à droite indique deux charges négatives en excès."],
+["La charge de l'ion Cu²⁺, exprimée en coulombs, est :",["+3,2 × 10⁻¹⁹ C","+1,6 × 10⁻¹⁹ C","−3,2 × 10⁻¹⁹ C","+2 C"],"2 × 1,6 × 10⁻¹⁹ = 3,2 × 10⁻¹⁹ C."],
+["Un ion monoatomique est formé :",["d'un seul atome","de plusieurs atomes","d'une molécule d'eau","de deux noyaux"],"Exemples : Na⁺, Cl⁻, Fe²⁺."],
+["Lequel de ces ions est polyatomique ?",["SO₄²⁻","Cl⁻","Na⁺","Zn²⁺"],"L'ion sulfate est formé d'un atome de soufre et de quatre atomes d'oxygène."],
+["La formule de l'ion fer III est :",["Fe³⁺","Fe²⁺","Fe³⁻","3Fe⁺"],"Fe²⁺ est l'ion fer II."],
+["La formule de l'ion hydroxyde est :",["HO⁻","H⁺","H₃O⁺","O²⁻"],"H⁺ est l'ion hydrogène et O²⁻ l'ion oxyde."],
+["La formule de l'ion sodium est :",["Na⁺","Na⁻","So⁺","S²⁻"],"Le symbole du sodium est Na."],
+["L'ion NO₃⁻ s'appelle l'ion :",["nitrate","sulfate","carbonate","ammonium"],"Sulfate : SO₄²⁻ ; carbonate : CO₃²⁻ ; ammonium : NH₄⁺."],
+["L'ion NH₄⁺ s'appelle l'ion :",["ammonium","nitrate","hydronium","hydroxyde"],"C'est un cation polyatomique."],
+["Dans un métal, le courant électrique est dû au déplacement :",["des électrons libres","des ions","des noyaux","des molécules"],"Ces électrons peuvent se déplacer d'un atome à l'autre."],
+["Dans un circuit, les électrons libres se déplacent :",["dans le sens opposé au sens conventionnel du courant","dans le sens conventionnel du courant","dans les deux sens à la fois","de la borne + vers la borne −"],"Ils vont de la borne − vers la borne + à l'extérieur du générateur."],
+["Dans une solution aqueuse, le courant électrique est dû au déplacement :",["des ions (cations et anions)","des électrons libres","des molécules d'eau","des noyaux"],"Les cations et les anions se déplacent en sens opposés."]]},
+{sem:0,name:"L'oxydation des métaux dans l'air",qs:[
+["L'oxydation d'un métal dans l'air est une réaction chimique entre ce métal et :",["le dioxygène","le diazote","le dioxyde de carbone","l'argon"],"L'air contient environ 21 % de dioxygène."],
+["La rouille se forme lorsque le fer est en contact avec :",["l'air humide (dioxygène et eau)","l'air sec seulement","l'eau bouillie sans air","l'huile"],"Il faut à la fois du dioxygène et de l'eau."],
+["Un clou en fer placé dans de l'air sec :",["ne rouille pas","rouille très vite","devient noir","fond"],"Sans eau, la rouille ne se forme pas."],
+["Un clou en fer placé dans de l'eau bouillie recouverte d'huile :",["ne rouille pas, car il n'y a pas de dioxygène","rouille fortement","se dissout","devient vert"],"L'ébullition chasse l'air dissous et l'huile empêche l'air de revenir."],
+["Dans quel tube le clou en fer rouille-t-il le plus ?",["air et eau salée","air sec","eau bouillie et huile","huile seule"],"Le sel accélère la formation de la rouille."],
+["La rouille est constituée principalement :",["d'oxyde de fer III","d'oxyde de cuivre","d'alumine","de chlorure de fer"],"Sa formule est Fe₂O₃."],
+["La formule chimique de l'oxyde de fer III est :",["Fe₂O₃","Fe₃O₄","FeO₂","Fe₃O₂"],"Fe₃O₄ est l'oxyde magnétique de fer."],
+["L'équation de la formation de la rouille est :",["4 Fe + 3 O₂ → 2 Fe₂O₃","Fe + O₂ → FeO₂","2 Fe + O₂ → Fe₂O₃","3 Fe + 2 O₂ → Fe₂O₃"],"De chaque côté : 4 atomes de fer et 6 atomes d'oxygène."],
+["La couleur de la rouille est :",["brun-rouge","bleue","verte","blanche"],"C'est la couleur caractéristique de l'oxyde de fer III."],
+["La rouille est une couche poreuse. Cela veut dire qu'elle :",["laisse passer l'air et l'eau","arrête l'air et l'eau","est très dure","est transparente"],"L'air humide continue d'atteindre le fer situé en dessous."],
+["Comme la rouille est poreuse, la corrosion du fer :",["continue jusqu'à la destruction totale du fer","s'arrête après quelques jours","protège le fer","rend le fer plus solide"],"C'est pourquoi il faut protéger les objets en fer."],
+["La destruction lente d'un métal par l'air humide s'appelle :",["la corrosion","la fusion","la dissolution","la combustion"],"La rouille est le résultat de la corrosion du fer."],
+["Pour protéger le fer de la corrosion, on le recouvre :",["d'une couche imperméable à l'air : peinture, zinc, chrome…","d'eau salée","d'une couche de rouille","de papier mouillé"],"On empêche ainsi le contact entre le fer et l'air humide."],
+["Recouvrir le fer d'une couche de zinc s'appelle :",["la galvanisation","la distillation","la filtration","la combustion"],"Le zinc forme une couche qui protège le fer."],
+["Dans la formation de la rouille, les réactifs sont :",["le fer et le dioxygène","la rouille et l'eau","l'oxyde de fer III et le fer","le fer et le diazote"],"Le produit est l'oxyde de fer III."],
+["La formation de la rouille est une oxydation :",["lente","vive","instantanée","impossible à l'air libre"],"Elle dure des jours ou des mois ; la combustion, elle, est une oxydation vive."],
+["L'aluminium laissé à l'air se couvre d'une fine couche :",["d'alumine","de rouille","de vert-de-gris","de chlorure d'aluminium"],"L'alumine est l'oxyde d'aluminium."],
+["La formule chimique de l'alumine est :",["Al₂O₃","AlO₂","Al₃O₂","Al₂O"],"Deux atomes d'aluminium pour trois atomes d'oxygène."],
+["L'équation de l'oxydation de l'aluminium est :",["4 Al + 3 O₂ → 2 Al₂O₃","Al + O₂ → AlO₂","2 Al + O₂ → Al₂O₃","2 Al + 3 O₂ → Al₂O₃"],"De chaque côté : 4 atomes d'aluminium et 6 atomes d'oxygène."],
+["La couche d'alumine est :",["imperméable : elle protège l'aluminium","poreuse : elle détruit l'aluminium","liquide","attirée par l'aimant"],"Contrairement à la rouille, elle arrête l'air."],
+["L'aluminium n'a pas besoin d'être peint contre la corrosion car :",["la couche d'alumine le protège en profondeur","il ne réagit jamais avec le dioxygène","il est attiré par l'aimant","il est plus lourd que le fer"],"L'aluminium réagit avec le dioxygène, mais seulement en surface."],
+["La différence entre la rouille et l'alumine est :",["la rouille est poreuse, l'alumine est imperméable","la rouille est imperméable, l'alumine est poreuse","les deux sont poreuses","les deux protègent le métal"],"C'est pourquoi le fer est détruit par la corrosion et pas l'aluminium."],
+["La combustion d'un métal dans le dioxygène est :",["une oxydation vive","une dissolution","une fusion","un changement d'état"],"Elle produit un oxyde métallique, avec de la chaleur et de la lumière."],
+["La combustion du fer dans le dioxygène produit :",["de l'oxyde magnétique de fer Fe₃O₄","de la rouille Fe₂O₃","de l'alumine Al₂O₃","du dioxyde de carbone CO₂"],"Il se forme des particules gris foncé attirées par l'aimant."],
+["L'équation de la combustion du fer est :",["3 Fe + 2 O₂ → Fe₃O₄","4 Fe + 3 O₂ → 2 Fe₂O₃","Fe + O₂ → FeO₂","2 Fe + O₂ → 2 FeO"],"De chaque côté : 3 atomes de fer et 4 atomes d'oxygène."],
+["La combustion du cuivre produit un oxyde de couleur :",["noire","blanche","bleue","rouge brique"],"C'est l'oxyde de cuivre II, de formule CuO."],
+["L'équation de la combustion du cuivre est :",["2 Cu + O₂ → 2 CuO","Cu + O₂ → CuO₂","4 Cu + 3 O₂ → 2 Cu₂O₃","Cu + O → CuO"],"De chaque côté : 2 atomes de cuivre et 2 atomes d'oxygène."],
+["La combustion du zinc produit :",["de l'oxyde de zinc ZnO, de couleur blanche","de l'oxyde de zinc ZnO, de couleur noire","de la rouille","de l'alumine"],"2 Zn + O₂ → 2 ZnO."],
+["La combustion de la poudre d'aluminium produit une poudre blanche :",["d'alumine Al₂O₃","d'oxyde de zinc ZnO","d'oxyde de cuivre CuO","d'oxyde magnétique Fe₃O₄"],"4 Al + 3 O₂ → 2 Al₂O₃."],
+["Dans l'équation 4 Al + 3 O₂ → 2 Al₂O₃, le nombre d'atomes d'oxygène de chaque côté est :",["6","3","2","5"],"À gauche 3 × 2 = 6 ; à droite 2 × 3 = 6."],
+["Dans l'équation 3 Fe + 2 O₂ → Fe₃O₄, le nombre de molécules de dioxygène consommées est :",["2","3","4","1"],"Le coefficient placé devant O₂ est 2."],
+["Un métal réagit avec le dioxygène. Le produit obtenu est :",["un oxyde métallique","un acide","un alliage","un gaz"],"Exemples : Fe₂O₃, Al₂O₃, CuO, ZnO."],
+["Une voiture rouille plus vite au bord de la mer car :",["l'air y est humide et salé","l'air y est plus sec","il y a moins de dioxygène","le sable protège le fer"],"L'eau salée accélère la corrosion du fer."]]},
+{sem:0,name:"La combustion des matériaux organiques",qs:[
+["Les matériaux organiques sont constitués essentiellement d'atomes :",["de carbone et d'hydrogène","de fer et de cuivre","de silicium et d'oxygène","de sodium et de chlore"],"Certains contiennent aussi, en plus faible proportion, de l'oxygène, du chlore ou de l'azote."],
+["Lequel de ces matériaux est organique ?",["le papier","le verre","le fer","la porcelaine"],"Le papier est fabriqué à partir du bois."],
+["Parmi ces matériaux organiques, lequel est d'origine végétale ?",["le coton","le nylon","le polyéthylène","le PVC"],"Le coton est d'origine végétale ; les autres sont synthétiques."],
+["Lequel de ces matériaux organiques est synthétique ?",["le nylon","le bois","le coton","la laine"],"Le nylon est fabriqué par l'industrie."],
+["La combustion d'un matériau organique est une réaction chimique avec :",["le dioxygène de l'air","le diazote de l'air","la vapeur d'eau","le dioxyde de carbone"],"Le dioxygène est le comburant."],
+["Dans la combustion du papier, le comburant est :",["le dioxygène","le papier","le dioxyde de carbone","l'eau"],"Le papier est le combustible."],
+["La combustion complète d'un matériau organique produit :",["du dioxyde de carbone et de l'eau","du carbone et du monoxyde de carbone seulement","du dioxygène","du fer et de l'eau"],"Le carbone du matériau donne CO₂ et l'hydrogène donne H₂O."],
+["Pour mettre en évidence le dioxyde de carbone, on utilise :",["l'eau de chaux, qui se trouble","le sulfate de cuivre anhydre, qui bleuit","le nitrate d'argent","la soude"],"L'eau de chaux devient blanche et trouble en présence de CO₂."],
+["Pour mettre en évidence l'eau formée lors d'une combustion, on utilise :",["le sulfate de cuivre anhydre","l'eau de chaux","le papier pH","un aimant"],"Le sulfate de cuivre anhydre, blanc, devient bleu au contact de l'eau."],
+["Au contact de l'eau, le sulfate de cuivre anhydre passe :",["du blanc au bleu","du bleu au blanc","du blanc au rouge","du vert au noir"],"C'est le test de reconnaissance de l'eau."],
+["Quand on brûle du papier, l'eau de chaux se trouble. Cela prouve la formation :",["de dioxyde de carbone","d'eau","de dioxygène","de carbone"],"Le trouble de l'eau de chaux est le test du CO₂."],
+["Quand on brûle du papier, la fumée noire indique la formation :",["de carbone","d'eau","de dioxygène","de dioxyde de carbone"],"Le carbone non brûlé forme la suie noire."],
+["Le papier qui brûle avec une flamme jaune et une fumée noire subit une combustion :",["incomplète","complète","sans dioxygène","impossible"],"La fumée noire (carbone) est le signe d'une combustion incomplète."],
+["Une combustion est incomplète quand :",["le dioxygène est en quantité insuffisante","le dioxygène est en excès","il n'y a pas de combustible","la température est trop basse pour brûler"],"Tout le carbone ne peut pas se transformer en dioxyde de carbone."],
+["La combustion incomplète du papier produit :",["de l'eau, du dioxyde de carbone, du monoxyde de carbone et du carbone","seulement de l'eau","seulement du dioxyde de carbone","du dioxygène et du diazote"],"Papier + O₂ → H₂O + CO₂ + CO + C."],
+["La formation de CO₂ lors de la combustion du papier montre que le papier contient des atomes :",["de carbone","de chlore","d'azote","de fer"],"Les atomes se conservent : le carbone du CO₂ vient du papier."],
+["La formation d'eau lors de la combustion du papier montre que le papier contient des atomes :",["d'hydrogène","de chlore","d'azote","de soufre"],"L'hydrogène de H₂O vient du papier."],
+["La formule du monoxyde de carbone est :",["CO","CO₂","C","H₂O"],"CO₂ est le dioxyde de carbone."],
+["Le monoxyde de carbone est un gaz :",["toxique, inodore et incolore","sans danger","coloré et parfumé","qui rallume une bûchette"],"On ne peut ni le voir ni le sentir : il peut être mortel."],
+["La combustion complète du polyéthylène produit essentiellement :",["de l'eau et du dioxyde de carbone","du chlorure d'hydrogène","du cyanure d'hydrogène","du carbone seulement"],"Le polyéthylène ne contient que du carbone et de l'hydrogène."],
+["La combustion incomplète du polyéthylène produit, en plus de l'eau et du dioxyde de carbone :",["du carbone et du monoxyde de carbone","du chlorure d'hydrogène","du cyanure d'hydrogène","du dioxygène"],"Le monoxyde de carbone est un gaz toxique."],
+["La combustion du PVC libère un gaz toxique :",["le chlorure d'hydrogène","le dioxygène","le diazote","la vapeur d'eau"],"Le PVC contient des atomes de chlore."],
+["La formule du chlorure d'hydrogène est :",["HCl","HCN","CO","H₂O"],"HCN est le cyanure d'hydrogène."],
+["La formation de chlorure d'hydrogène montre que le PVC contient des atomes :",["de chlore","d'azote","de fer","de soufre"],"PVC signifie polychlorure de vinyle."],
+["La combustion du nylon libère un gaz mortel :",["le cyanure d'hydrogène","le dioxygène","le dihydrogène","le diazote"],"Sa formule est HCN."],
+["La formation de cyanure d'hydrogène (HCN) montre que le nylon contient des atomes :",["d'azote","de chlore","de fer","de soufre"],"N est le symbole de l'azote."],
+["Brûler des déchets plastiques à l'air libre est dangereux car cela :",["libère des gaz toxiques","produit du dioxygène","refroidit l'air","purifie l'air"],"Par exemple CO, HCl ou HCN selon le plastique."],
+["Parmi ces produits de combustion, lequel n'est pas toxique ?",["la vapeur d'eau","le monoxyde de carbone","le chlorure d'hydrogène","le cyanure d'hydrogène"],"CO, HCl et HCN sont des gaz dangereux."],
+["Pour éviter l'intoxication au monoxyde de carbone à la maison, il faut :",["bien aérer les pièces où brûle un chauffage","fermer toutes les fenêtres","brûler du plastique","boucher les aérations"],"Une bonne aération apporte assez de dioxygène."],
+["Le dioxyde de carbone rejeté par les combustions contribue :",["à l'effet de serre","à la formation de l'ozone","à la purification de l'air","à la formation de la rouille"],"C'est un gaz à effet de serre."],
+["Au cours d'une combustion, les atomes :",["se conservent","disparaissent","se transforment en d'autres atomes","se multiplient"],"On retrouve dans les produits les atomes présents dans les réactifs."],
+["Le polyéthylène est constitué uniquement d'atomes :",["de carbone et d'hydrogène","de carbone et de chlore","d'hydrogène et d'azote","de carbone et d'oxygène"],"C'est pourquoi sa combustion complète ne donne que CO₂ et H₂O."]]},
+{sem:0,name:"Les solutions acides et basiques (pH)",qs:[
+["Une solution aqueuse est obtenue en dissolvant un soluté dans :",["l'eau","l'huile","l'alcool","l'acétone"],"Dans une solution aqueuse, le solvant est l'eau."],
+["Dans l'eau salée, le sel est :",["le soluté","le solvant","la solution","le précipité"],"Solution = soluté + solvant."],
+["Une solution aqueuse est un mélange :",["homogène","hétérogène","toujours coloré","solide"],"On ne distingue pas le soluté dissous à l'œil nu."],
+["Le pH est un nombre :",["sans unité","en grammes par litre","en volts","en degrés Celsius"],"Il renseigne sur l'acidité d'une solution aqueuse."],
+["Le pH d'une solution aqueuse est compris entre :",["0 et 14","0 et 7","1 et 100","7 et 14"],"L'échelle de pH va de 0 à 14."],
+["Une solution de pH = 3 est :",["acide","neutre","basique","pure"],"pH < 7 : la solution est acide."],
+["Une solution de pH = 11 est :",["basique","acide","neutre","salée"],"pH > 7 : la solution est basique."],
+["Une solution de pH = 7 est :",["neutre","acide","basique","concentrée"],"C'est le cas de l'eau pure."],
+["Le pH de l'eau pure est :",["7","0","14","1"],"L'eau pure est neutre."],
+["Pour mesurer le pH, on utilise :",["le papier pH ou le pH-mètre","un thermomètre","un voltmètre","une balance"],"Le papier pH change de couleur selon le pH de la solution."],
+["Le papier pH donne une valeur du pH :",["approchée","très précise","toujours égale à 7","en volts"],"On compare la couleur obtenue aux couleurs de l'échelle."],
+["Le pH-mètre donne une valeur du pH :",["précise","approchée","toujours entière","fausse"],"La valeur s'affiche directement sur l'écran de l'appareil."],
+["Pour utiliser le papier pH, on :",["dépose une goutte de solution dessus puis on compare la couleur à l'échelle","le plonge dans le flacon et on le goûte","le chauffe avec une flamme","le pèse sur une balance"],"On ne goûte jamais un produit chimique."],
+["Avant de plonger la sonde du pH-mètre dans une solution, il faut :",["la rincer","la chauffer","la sécher à la flamme","la tremper dans un acide concentré"],"Le rinçage évite de mélanger les solutions."],
+["L'ion responsable du caractère acide d'une solution est :",["l'ion hydrogène H⁺","l'ion hydroxyde HO⁻","l'ion chlorure Cl⁻","l'ion sodium Na⁺"],"Plus il y a d'ions H⁺, plus la solution est acide."],
+["L'ion responsable du caractère basique d'une solution est :",["l'ion hydroxyde HO⁻","l'ion hydrogène H⁺","l'ion chlorure Cl⁻","l'ion sodium Na⁺"],"Plus il y a d'ions HO⁻, plus la solution est basique."],
+["Une solution acide contient :",["plus d'ions H⁺ que d'ions HO⁻","plus d'ions HO⁻ que d'ions H⁺","autant d'ions H⁺ que d'ions HO⁻","aucun ion"],"C'est l'inverse pour une solution basique."],
+["Une solution neutre contient :",["autant d'ions H⁺ que d'ions HO⁻","seulement des ions H⁺","seulement des ions HO⁻","aucune molécule d'eau"],"Son pH est égal à 7."],
+["Parmi ces solutions, la plus acide est celle de pH :",["1","3","6","9"],"Plus le pH est petit, plus la solution est acide."],
+["Parmi ces solutions, la plus basique est celle de pH :",["13","8","10","5"],"Plus le pH est grand, plus la solution est basique."],
+["Le jus de citron est une solution :",["acide","basique","neutre","sans ions"],"Son pH est inférieur à 7."],
+["La solution de soude est :",["basique","acide","neutre","sans danger"],"Son pH est proche de 14."],
+["L'acide chlorhydrique a un pH :",["inférieur à 7","égal à 7","supérieur à 7","égal à 14"],"C'est une solution acide."],
+["La formule ionique de l'acide chlorhydrique est :",["(H⁺ + Cl⁻)","(Na⁺ + HO⁻)","(Na⁺ + Cl⁻)","(Cu²⁺ + SO₄²⁻)"],"Il contient des ions hydrogène et des ions chlorure."],
+["La formule ionique de la solution de soude est :",["(Na⁺ + HO⁻)","(H⁺ + Cl⁻)","(Na⁺ + Cl⁻)","(Ag⁺ + NO₃⁻)"],"La soude est l'hydroxyde de sodium."],
+["Diluer une solution, c'est :",["lui ajouter de l'eau","la chauffer","lui ajouter du soluté","la filtrer"],"La solution devient moins concentrée."],
+["Quand on dilue une solution acide, son pH :",["augmente et se rapproche de 7","diminue","dépasse 7","ne change pas"],"Elle devient moins acide, mais elle reste acide."],
+["Quand on dilue une solution basique, son pH :",["diminue et se rapproche de 7","augmente","devient inférieur à 7","ne change pas"],"Elle devient moins basique, mais elle reste basique."],
+["Une solution acide a un pH de 2. Après dilution, son pH peut être :",["4","1","8","12"],"Le pH augmente vers 7 sans le dépasser."],
+["Une solution basique a un pH de 12. Après dilution, son pH peut être :",["10","13","5","14"],"Le pH diminue vers 7 sans passer en dessous."],
+["Une solution acide très diluée peut-elle devenir basique ?",["Non, son pH reste inférieur à 7","Oui, si on ajoute beaucoup d'eau","Oui, toujours","Oui, si l'eau est froide"],"La dilution rapproche le pH de 7, sans le dépasser."],
+["Pour diluer un acide concentré en toute sécurité, on verse :",["l'acide dans l'eau","l'eau dans l'acide","les deux en même temps dans un flacon fermé","l'acide dans de la soude"],"Verser l'eau dans l'acide peut provoquer des projections dangereuses."],
+["On ajoute 90 mL d'eau à 10 mL d'acide chlorhydrique. Le volume de la solution obtenue est :",["100 mL","90 mL","80 mL","900 mL"],"10 + 90 = 100 mL : la solution est diluée 10 fois."],
+["Le pictogramme « corrosif » signifie que le produit :",["attaque la peau, les yeux et certains métaux","s'enflamme facilement","peut exploser","est sans danger"],"Les acides et les bases concentrés sont corrosifs."],
+["Pour manipuler une solution acide ou basique concentrée, il faut porter :",["une blouse, des gants et des lunettes de protection","des vêtements légers","seulement une montre","rien de particulier"],"Ces solutions peuvent provoquer de graves brûlures."],
+["Avant d'utiliser un produit ménager acide ou basique, il faut d'abord :",["lire attentivement son étiquette","le sentir de près","le goûter","le mélanger à un autre produit"],"L'étiquette porte les pictogrammes de danger et les précautions à prendre."]]},
+{sem:0,name:"Action des solutions acides et basiques sur les métaux",qs:[
+["La formule ionique de la solution d'acide chlorhydrique est :",["(H⁺ + Cl⁻)","(Na⁺ + HO⁻)","(Na⁺ + Cl⁻)","(Fe²⁺ + 2 Cl⁻)"],"Elle contient des ions hydrogène H⁺ et des ions chlorure Cl⁻."],
+["L'acide chlorhydrique réagit avec :",["le fer, le zinc et l'aluminium","le cuivre seulement","le cuivre, l'or et l'argent","aucun métal"],"Il ne réagit pas avec le cuivre."],
+["Parmi ces métaux, lequel ne réagit pas avec l'acide chlorhydrique ?",["le cuivre","le fer","le zinc","l'aluminium"],"On n'observe aucun dégagement gazeux avec le cuivre."],
+["Le gaz qui se dégage quand l'acide chlorhydrique attaque un métal est :",["le dihydrogène","le dioxygène","le dioxyde de carbone","le diazote"],"Sa formule est H₂."],
+["La formule du dihydrogène est :",["H₂","H⁺","H₂O","HO⁻"],"H⁺ est l'ion hydrogène."],
+["On reconnaît le dihydrogène car, à l'approche d'une flamme, il :",["produit une détonation","éteint la flamme sans bruit","rallume une bûchette incandescente","trouble l'eau de chaux"],"On entend un petit « boum »."],
+["Lors de la réaction de l'acide chlorhydrique avec le fer, les atomes de fer se transforment en :",["ions fer II Fe²⁺","ions fer III Fe³⁺","rouille","oxyde de fer"],"Chaque atome de fer perd deux électrons."],
+["Lors de la réaction avec un métal, les ions hydrogène H⁺ de l'acide se transforment en :",["molécules de dihydrogène H₂","molécules d'eau","ions chlorure","ions hydroxyde"],"C'est le gaz qui se dégage."],
+["L'équation bilan de la réaction du fer avec l'acide chlorhydrique est :",["Fe + 2 H⁺ → Fe²⁺ + H₂","Fe + H⁺ → Fe⁺ + H","Fe + 2 Cl⁻ → FeCl₂","Fe + H₂ → Fe²⁺ + 2 H⁺"],"Les atomes et les charges se conservent : 2+ de chaque côté."],
+["L'équation bilan de la réaction du zinc avec l'acide chlorhydrique est :",["Zn + 2 H⁺ → Zn²⁺ + H₂","Zn + H⁺ → Zn⁺ + H₂","Zn + 2 Cl⁻ → ZnCl₂","2 Zn + 6 H⁺ → 2 Zn³⁺ + 3 H₂"],"L'atome de zinc se transforme en ion Zn²⁺."],
+["L'équation bilan de la réaction de l'aluminium avec l'acide chlorhydrique est :",["2 Al + 6 H⁺ → 2 Al³⁺ + 3 H₂","Al + 2 H⁺ → Al²⁺ + H₂","Al + 3 H⁺ → Al³⁺ + H₂","2 Al + 3 H⁺ → 2 Al³⁺ + 3 H₂"],"6 charges + à gauche et 2 × 3 = 6 charges + à droite."],
+["Lors de la réaction de l'aluminium avec l'acide chlorhydrique, il se forme des ions :",["Al³⁺","Al²⁺","Al⁺","Al³⁻"],"Chaque atome d'aluminium perd trois électrons."],
+["Lors de la réaction de l'acide chlorhydrique avec un métal, les ions chlorure Cl⁻ :",["ne participent pas à la réaction","se transforment en dichlore","se transforment en dihydrogène","disparaissent"],"Ce sont des ions spectateurs : on ne les écrit pas dans l'équation bilan."],
+["La solution obtenue après la réaction de l'acide chlorhydrique avec le fer est une solution de :",["chlorure de fer II","chlorure de fer III","chlorure de zinc","sulfate de fer II"],"Elle contient les ions Fe²⁺ et Cl⁻."],
+["La formule ionique de la solution de chlorure de fer II est :",["(Fe²⁺ + 2 Cl⁻)","(Fe²⁺ + Cl⁻)","(Fe³⁺ + 3 Cl⁻)","(2 Fe²⁺ + Cl⁻)"],"Il faut deux ions Cl⁻ pour compenser la charge d'un ion Fe²⁺."],
+["La formule ionique de la solution de chlorure de zinc est :",["(Zn²⁺ + 2 Cl⁻)","(Zn⁺ + Cl⁻)","(Zn²⁺ + Cl⁻)","(Zn³⁺ + 3 Cl⁻)"],"La solution est électriquement neutre."],
+["La formule ionique de la solution de chlorure d'aluminium est :",["(Al³⁺ + 3 Cl⁻)","(Al³⁺ + Cl⁻)","(Al²⁺ + 2 Cl⁻)","(3 Al³⁺ + Cl⁻)"],"Trois ions Cl⁻ compensent la charge d'un ion Al³⁺."],
+["Pendant que l'acide chlorhydrique attaque le fer, le pH de la solution :",["augmente, car des ions H⁺ sont consommés","diminue","reste égal à 7","devient égal à 0"],"Il y a de moins en moins d'ions H⁺ : la solution devient moins acide."],
+["La solution de soude a pour formule ionique :",["(Na⁺ + HO⁻)","(H⁺ + Cl⁻)","(Na⁺ + Cl⁻)","(Zn²⁺ + 2 HO⁻)"],"La soude est une solution d'hydroxyde de sodium."],
+["La solution de soude réagit avec :",["l'aluminium et le zinc","le fer et le cuivre","le cuivre seulement","tous les métaux"],"Elle ne réagit ni avec le fer ni avec le cuivre."],
+["Parmi ces métaux, lesquels ne réagissent pas avec la solution de soude ?",["le fer et le cuivre","le zinc et l'aluminium","l'aluminium et le fer","le zinc et le cuivre"],"Seuls le zinc et l'aluminium sont attaqués par la soude."],
+["Le gaz dégagé lors de la réaction de la soude avec l'aluminium est :",["le dihydrogène","le dioxygène","le dioxyde de carbone","le dichlore"],"On le reconnaît à la détonation près d'une flamme."],
+["La réaction du zinc avec la soude produit du dihydrogène et :",["du zincate de sodium","du chlorure de zinc","de l'oxyde de zinc","de l'alumine"],"Zinc + hydroxyde de sodium → dihydrogène + zincate de sodium."],
+["La réaction de l'aluminium avec la soude produit du dihydrogène et :",["de l'aluminate de sodium","du chlorure d'aluminium","de l'alumine","du zincate de sodium"],"Aluminium + hydroxyde de sodium → dihydrogène + aluminate de sodium."],
+["Le métal qui ne réagit ni avec l'acide chlorhydrique ni avec la soude est :",["le cuivre","le zinc","l'aluminium","le fer"],"Le fer réagit avec l'acide ; le zinc et l'aluminium réagissent avec les deux."],
+["Les métaux qui réagissent à la fois avec l'acide chlorhydrique et avec la soude sont :",["le zinc et l'aluminium","le fer et le cuivre","le cuivre et le zinc","le fer et l'aluminium"],"Le fer ne réagit qu'avec l'acide ; le cuivre avec aucun des deux."],
+["Le métal qui réagit avec l'acide chlorhydrique mais pas avec la soude est :",["le fer","le zinc","l'aluminium","le cuivre"],"Le cuivre ne réagit avec aucune de ces deux solutions."],
+["Au laboratoire, on conserve les acides et les bases dans des flacons :",["en verre ou en plastique","en fer","en zinc","en aluminium"],"Le verre et les plastiques ne sont pas facilement attaqués par ces solutions."],
+["On ne doit pas conserver une solution de soude dans un récipient en aluminium car :",["la soude attaque l'aluminium","l'aluminium est trop léger","la soude devient acide","l'aluminium est isolant"],"Le récipient serait percé et du dihydrogène se dégagerait."],
+["On peut conserver de l'acide chlorhydrique dilué dans un récipient en :",["cuivre","fer","zinc","aluminium"],"Parmi ces quatre métaux, seul le cuivre n'est pas attaqué par cet acide."],
+["Dans l'équation Fe + 2 H⁺ → Fe²⁺ + H₂, les réactifs sont :",["le fer et les ions hydrogène","les ions fer II et le dihydrogène","les ions chlorure","le fer et le dihydrogène"],"Les produits sont les ions Fe²⁺ et le dihydrogène H₂."],
+["Dans l'équation Zn + 2 H⁺ → Zn²⁺ + H₂, la charge totale de chaque côté est :",["2+","0","1+","4+"],"À gauche : 2 × (1+) ; à droite : 2+. Les charges se conservent."],
+["Un détartrant contient de l'acide chlorhydrique. Il ne faut pas l'utiliser sur un objet en :",["zinc","verre","plastique","porcelaine"],"L'acide attaque le zinc avec dégagement de dihydrogène."]]},
+{sem:0,name:"Tests de reconnaissance de quelques ions",qs:[
+["Toute solution aqueuse ionique est électriquement :",["neutre","positive","négative","chargée selon sa couleur"],"La somme des charges des cations et des anions est égale à zéro."],
+["La formule ionique de la solution de chlorure de sodium est :",["(Na⁺ + Cl⁻)","(Na⁺ + HO⁻)","(H⁺ + Cl⁻)","(Na²⁺ + 2 Cl⁻)"],"C'est l'eau salée."],
+["La formule ionique de la solution de sulfate de cuivre est :",["(Cu²⁺ + SO₄²⁻)","(Cu⁺ + SO₄⁻)","(Cu²⁺ + 2 Cl⁻)","(2 Cu²⁺ + SO₄²⁻)"],"La charge 2+ de l'ion cuivre compense la charge 2− de l'ion sulfate."],
+["La formule ionique de la solution de chlorure de fer III est :",["(Fe³⁺ + 3 Cl⁻)","(Fe³⁺ + Cl⁻)","(Fe²⁺ + 2 Cl⁻)","(3 Fe³⁺ + Cl⁻)"],"Il faut trois ions Cl⁻ pour un ion Fe³⁺."],
+["La formule ionique de la solution de nitrate d'argent est :",["(Ag⁺ + NO₃⁻)","(Ag⁺ + Cl⁻)","(Na⁺ + NO₃⁻)","(Ag²⁺ + 2 NO₃⁻)"],"Elle sert à reconnaître les ions chlorure."],
+["La formule ionique de la solution de sulfate de fer II est :",["(Fe²⁺ + SO₄²⁻)","(Fe³⁺ + SO₄²⁻)","(Fe²⁺ + 2 Cl⁻)","(Fe²⁺ + 2 SO₄²⁻)"],"Un ion Fe²⁺ pour un ion SO₄²⁻."],
+["Un précipité est :",["un solide qui se forme dans une solution","un gaz qui se dégage","un liquide coloré","un papier indicateur"],"Il apparaît quand certains ions se rencontrent."],
+["Pour reconnaître les ions chlorure Cl⁻, on utilise :",["la solution de nitrate d'argent","la solution de soude","l'eau de chaux","le sulfate de cuivre anhydre"],"C'est la solution détectrice des ions chlorure."],
+["Avec le nitrate d'argent, les ions chlorure donnent un précipité :",["blanc qui noircit à la lumière","bleu","vert foncé","rouille"],"Ce précipité est le chlorure d'argent."],
+["Le précipité obtenu lors du test des ions chlorure s'appelle :",["le chlorure d'argent","le nitrate d'argent","le chlorure de sodium","l'hydroxyde d'argent"],"Sa formule est AgCl."],
+["La formule du chlorure d'argent est :",["AgCl","AgNO₃","NaCl","Ag₂O"],"Un ion Ag⁺ s'associe à un ion Cl⁻."],
+["L'équation de précipitation du chlorure d'argent est :",["Ag⁺ + Cl⁻ → AgCl","Ag + Cl → AgCl₂","Ag⁺ + NO₃⁻ → AgNO₃","Na⁺ + Cl⁻ → NaCl"],"Les ions Na⁺ et NO₃⁻ ne participent pas à la réaction."],
+["Exposé à la lumière, le précipité de chlorure d'argent :",["noircit","devient bleu","disparaît","devient vert"],"C'est ce qui le distingue des autres précipités blancs."],
+["Pour reconnaître les ions métalliques Cu²⁺, Fe²⁺, Fe³⁺, Zn²⁺ et Al³⁺, on utilise :",["la solution de soude","la solution de nitrate d'argent","l'eau de chaux","le papier pH"],"La couleur du précipité obtenu indique l'ion présent."],
+["Les ions de la soude qui réagissent avec les ions métalliques sont :",["les ions hydroxyde HO⁻","les ions sodium Na⁺","les ions chlorure Cl⁻","les ions hydrogène H⁺"],"Ils forment des hydroxydes métalliques insolubles."],
+["Avec la soude, les ions cuivre II Cu²⁺ donnent un précipité :",["bleu","vert foncé","rouille","blanc"],"C'est l'hydroxyde de cuivre II."],
+["Avec la soude, les ions fer II Fe²⁺ donnent un précipité :",["vert foncé","bleu","rouille","blanc"],"C'est l'hydroxyde de fer II."],
+["Avec la soude, les ions fer III Fe³⁺ donnent un précipité :",["rouille","vert foncé","bleu","blanc"],"C'est l'hydroxyde de fer III."],
+["Avec la soude, les ions zinc Zn²⁺ donnent un précipité :",["blanc","bleu","vert foncé","rouille"],"C'est l'hydroxyde de zinc."],
+["Avec la soude, les ions aluminium Al³⁺ donnent un précipité :",["blanc","bleu","rouille","vert foncé"],"C'est l'hydroxyde d'aluminium."],
+["La formule de l'hydroxyde de cuivre II est :",["Cu(OH)₂","CuOH","Cu(OH)₃","Cu₂OH"],"Un ion Cu²⁺ s'associe à deux ions HO⁻."],
+["La formule de l'hydroxyde de fer III est :",["Fe(OH)₃","Fe(OH)₂","FeOH","Fe₃OH"],"Un ion Fe³⁺ s'associe à trois ions HO⁻."],
+["La formule de l'hydroxyde de fer II est :",["Fe(OH)₂","Fe(OH)₃","Fe₂OH","FeO"],"Un ion Fe²⁺ s'associe à deux ions HO⁻."],
+["La formule de l'hydroxyde d'aluminium est :",["Al(OH)₃","Al(OH)₂","AlOH","Al₃OH"],"Un ion Al³⁺ s'associe à trois ions HO⁻."],
+["L'équation de précipitation de l'hydroxyde de cuivre II est :",["Cu²⁺ + 2 HO⁻ → Cu(OH)₂","Cu²⁺ + HO⁻ → CuOH","Cu²⁺ + 3 HO⁻ → Cu(OH)₃","Cu + 2 HO → Cu(OH)₂"],"Deux charges − compensent les deux charges + de l'ion cuivre."],
+["L'équation de précipitation de l'hydroxyde de fer III est :",["Fe³⁺ + 3 HO⁻ → Fe(OH)₃","Fe³⁺ + 2 HO⁻ → Fe(OH)₂","Fe²⁺ + 2 HO⁻ → Fe(OH)₂","Fe³⁺ + HO⁻ → FeOH"],"Il faut trois ions HO⁻ pour un ion Fe³⁺."],
+["L'équation de précipitation de l'hydroxyde de zinc est :",["Zn²⁺ + 2 HO⁻ → Zn(OH)₂","Zn²⁺ + HO⁻ → ZnOH","Zn³⁺ + 3 HO⁻ → Zn(OH)₃","Zn + 2 HO⁻ → ZnO"],"Le précipité obtenu est blanc."],
+["Une solution donne un précipité bleu avec la soude. Elle contient des ions :",["Cu²⁺","Fe²⁺","Fe³⁺","Zn²⁺"],"Bleu : cuivre II."],
+["Une solution donne un précipité vert foncé avec la soude. Elle contient des ions :",["Fe²⁺","Fe³⁺","Cu²⁺","Al³⁺"],"Vert foncé : fer II."],
+["Une solution donne un précipité rouille avec la soude. Elle contient des ions :",["Fe³⁺","Fe²⁺","Cu²⁺","Zn²⁺"],"Rouille : fer III."],
+["Une solution donne un précipité blanc avec la soude. Elle peut contenir des ions :",["Zn²⁺ ou Al³⁺","Cu²⁺","Fe²⁺","Fe³⁺"],"Ces deux ions donnent un précipité blanc."],
+["Une solution donne un précipité bleu avec la soude et un précipité blanc qui noircit à la lumière avec le nitrate d'argent. C'est une solution de :",["chlorure de cuivre II","chlorure de fer II","sulfate de cuivre","chlorure de zinc"],"Précipité bleu : ions Cu²⁺ ; précipité blanc qui noircit : ions Cl⁻."],
+["Une solution donne un précipité rouille avec la soude et un précipité blanc qui noircit à la lumière avec le nitrate d'argent. C'est une solution de :",["chlorure de fer III","chlorure de fer II","sulfate de fer III","chlorure de cuivre II"],"Rouille : ions Fe³⁺ ; précipité blanc qui noircit : ions Cl⁻."],
+["Après l'attaque du fer par l'acide chlorhydrique, on ajoute de la soude à la solution obtenue. Le précipité est :",["vert foncé","bleu","rouille","blanc"],"La solution contient des ions fer II Fe²⁺."],
+["Après l'attaque du zinc par l'acide chlorhydrique, on ajoute de la soude à la solution obtenue. Le précipité est :",["blanc","bleu","vert foncé","rouille"],"La solution contient des ions zinc Zn²⁺."],
+["On ajoute du nitrate d'argent à de l'acide chlorhydrique. On observe :",["un précipité blanc qui noircit à la lumière","un précipité bleu","un dégagement de dihydrogène","aucun changement"],"L'acide chlorhydrique contient des ions chlorure Cl⁻."],
+["Dans la solution de chlorure de fer III (Fe³⁺ + 3 Cl⁻), on trouve :",["trois ions Cl⁻ pour un ion Fe³⁺","un ion Cl⁻ pour trois ions Fe³⁺","autant d'ions Cl⁻ que d'ions Fe³⁺","seulement des ions Fe³⁺"],"Ainsi la solution reste électriquement neutre."],
+["Une solution de sulfate de zinc (Zn²⁺ + SO₄²⁻) donne, avec la soude, un précipité :",["blanc d'hydroxyde de zinc","bleu d'hydroxyde de cuivre","rouille d'hydroxyde de fer III","blanc de chlorure d'argent"],"Elle contient des ions Zn²⁺."]]},
+{sem:0,name:"Dangers de quelques matériaux usuels",qs:[
+["Une matière est dite dangereuse lorsqu'elle :",["nuit à la santé des personnes ou à l'environnement","coûte cher","est colorée","est liquide"],"La plupart des matières ne sont dangereuses que si on les manipule sans précaution."],
+["Sur l'étiquette d'un produit chimique, les pictogrammes servent à :",["indiquer les dangers du produit","décorer l'emballage","donner le prix","indiquer la date de fabrication"],"Il faut toujours les lire avant d'utiliser le produit."],
+["Le nombre de pictogrammes de sécurité étudiés en chimie est :",["9","3","5","20"],"Explosif, inflammable, comburant, gaz sous pression, corrosif, toxique, cancérogène, nocif ou irritant, dangereux pour l'environnement."],
+["Le pictogramme représentant une flamme signifie que le produit est :",["inflammable","corrosif","toxique","sans danger"],"Il peut s'enflammer au contact d'une flamme, d'une étincelle ou sous l'effet de la chaleur."],
+["Le pictogramme représentant une tête de mort signifie que le produit est :",["toxique","inflammable","explosif","comburant"],"Il peut être mortel en cas d'inhalation, d'ingestion ou de contact avec la peau."],
+["Le pictogramme représentant une flamme au-dessus d'un cercle signifie que le produit est :",["comburant","inflammable","corrosif","toxique"],"Il peut provoquer ou aggraver un incendie."],
+["Le pictogramme représentant une bombe qui explose signifie que le produit est :",["explosif","comburant","corrosif","irritant"],"Il peut exploser sous l'effet de la chaleur ou d'un choc."],
+["Le pictogramme représentant une bouteille de gaz signifie :",["gaz sous pression","produit comburant","produit toxique","produit recyclable"],"Le récipient peut exploser sous l'effet de la chaleur."],
+["Un produit corrosif :",["provoque des brûlures de la peau et attaque certains métaux","nourrit la peau","est toujours comestible","protège les métaux"],"Les acides et les bases concentrés sont corrosifs."],
+["Le pictogramme représentant un arbre et un poisson morts signifie que le produit est :",["dangereux pour l'environnement","inflammable","explosif","recyclable"],"Il est très toxique pour le milieu aquatique."],
+["Le pictogramme représentant un point d'exclamation signifie que le produit est :",["nocif ou irritant","explosif","comburant","sans danger"],"Il peut irriter la peau, les yeux ou les voies respiratoires."],
+["Un produit cancérogène est un produit qui :",["peut provoquer le cancer","guérit le cancer","s'enflamme facilement","attaque les métaux"],"Il faut éviter tout contact avec ce type de produit."],
+["Lequel de ces matériaux est biodégradable ?",["le papier","le verre","le plastique","l'aluminium"],"Le papier et le bois se décomposent naturellement."],
+["Lequel de ces matériaux n'est pas biodégradable ?",["le plastique","le papier","le bois","les restes de fruits"],"Le plastique, le verre et les métaux mettent très longtemps à se décomposer."],
+["Les déchets en verre, en plastique et en métal jetés dans la nature :",["mettent très longtemps à se décomposer","disparaissent en quelques jours","nourrissent le sol","sont sans effet"],"Ce sont des matériaux non biodégradables."],
+["Les déchets liquides toxiques jetés sur le sol peuvent :",["s'infiltrer et polluer les eaux souterraines","purifier les nappes d'eau","nourrir les plantes","s'évaporer sans laisser de trace"],"Ils atteignent les nappes phréatiques."],
+["Brûler les déchets à l'air libre :",["dégrade la qualité de l'air","améliore la qualité de l'air","ne produit aucun gaz","protège la couche d'ozone"],"La combustion des déchets libère des fumées et des gaz toxiques."],
+["Les déchets abandonnés près des habitations favorisent :",["les maladies de la peau et des voies respiratoires","une meilleure santé","la propreté des rues","la baisse de la pollution"],"Ils augmentent aussi le risque de cancers."],
+["Recycler un matériau, c'est :",["le récupérer pour fabriquer de nouveaux objets","le brûler à l'air libre","l'enterrer dans le sol","le jeter à la mer"],"Le recyclage réduit la quantité de déchets envoyés à la décharge."],
+["Parmi ces matériaux, lesquels sont recyclables ?",["les métaux, le verre et le plastique","aucun matériau","seulement le papier","seulement le bois"],"On les trie pour pouvoir les recycler."],
+["Le traitement biologique des déchets organiques permet de produire :",["des engrais organiques","du verre","du plastique","des métaux"],"C'est le compostage."],
+["La décomposition de la matière organique à l'abri de l'air produit un gaz utilisé comme source d'énergie :",["le méthane","le dioxygène","le diazote","l'hélium"],"On l'utilise pour l'éclairage et le chauffage."],
+["L'incinération des déchets permet de :",["produire de l'énergie thermique","fabriquer du verre","produire de l'eau potable","fabriquer des engrais"],"Cette énergie peut être convertie en d'autres formes d'énergie."],
+["Dans une décharge contrôlée, le fond de la fosse est recouvert d'une couche étanche pour :",["empêcher les liquides de s'infiltrer dans le sous-sol","chauffer les déchets","décorer la décharge","faire pousser des plantes"],"On protège ainsi les eaux souterraines."],
+["Le tri des déchets consiste à :",["les séparer selon leur type dans des conteneurs adaptés","les mélanger tous ensemble","les brûler","les jeter dans la rue"],"Le tri facilite le recyclage."],
+["La meilleure façon de limiter les déchets est d'abord de :",["réduire leur production","les brûler","les enterrer","les jeter dans la rivière"],"La prévention passe avant le recyclage et l'élimination."],
+["Il faut éviter de chauffer les aliments dans des récipients en :",["plastique","verre","porcelaine","terre cuite"],"À la chaleur, certains plastiques libèrent des substances nocives dans les aliments."],
+["Il faut éviter de réutiliser une petite bouteille d'eau en plastique si elle a été :",["exposée au soleil ou à la chaleur","lavée à l'eau froide","conservée à l'ombre","fermée avec son bouchon"],"La chaleur dégrade le plastique."],
+["Jeter les ordures ménagères dans la rue est un comportement :",["à éviter, car il nuit à la santé et à l'environnement","recommandé","sans conséquence","qui protège l'environnement"],"Les déchets doivent être mis dans les conteneurs adaptés."],
+["Les piles usagées doivent être :",["déposées dans un point de collecte","jetées dans la nature","brûlées","jetées dans l'eau"],"Elles contiennent des métaux toxiques."],
+["Avant d'utiliser un produit d'entretien, il faut :",["lire les pictogrammes et les conseils de son étiquette","le mélanger avec un autre produit","le respirer profondément","le transvaser dans une bouteille d'eau"],"Mélanger des produits ménagers peut libérer des gaz toxiques."],
+["La combustion des déchets en PVC est particulièrement dangereuse car elle libère :",["du chlorure d'hydrogène, un gaz toxique","du dioxygène","de la vapeur d'eau seulement","du diazote"],"C'est pourquoi on ne doit pas brûler les plastiques."]]},
+{sem:1,name:"Le mouvement et le repos",qs:[
+["Pour décrire le mouvement d'un corps, il faut d'abord choisir :",["un corps de référence (référentiel)","une balance","un thermomètre","une couleur"],"Le mouvement est toujours décrit par rapport à un autre corps."],
+["Le corps par rapport auquel on étudie un mouvement s'appelle :",["le référentiel","la trajectoire","le mobile","la vitesse"],"On dit aussi le corps de référence."],
+["Un corps est en mouvement par rapport à un référentiel si :",["sa position change par rapport à ce référentiel","sa position ne change pas","sa masse change","sa couleur change"],"Si sa position ne change pas, il est au repos."],
+["Un corps est au repos par rapport à un référentiel si :",["sa position ne change pas par rapport à ce référentiel","sa position change","il est léger","il est lourd"],"Le repos dépend du référentiel choisi."],
+["On dit que le mouvement et le repos sont des notions relatives car :",["elles dépendent du référentiel choisi","elles dépendent de la masse du corps","elles sont toujours fausses","elles ne s'appliquent qu'aux voitures"],"Un même corps peut être au repos dans un référentiel et en mouvement dans un autre."],
+["Mohammed est assis dans un tramway qui roule. Par rapport à son siège, il est :",["au repos","en mouvement","en rotation","en chute"],"Sa position par rapport au siège ne change pas."],
+["Mohammed est assis dans un tramway qui roule. Par rapport aux gens debout au bord de la voie, il est :",["en mouvement","au repos","immobile","en rotation"],"Sa position par rapport à eux change."],
+["Un arbre au bord de la route est, par rapport à une voiture qui roule :",["en mouvement","au repos","en rotation","en chute"],"La distance entre l'arbre et la voiture change."],
+["Un arbre au bord de la route est, par rapport à la route :",["au repos","en mouvement","en rotation","en translation"],"Sa position par rapport à la route ne change pas."],
+["Deux voitures roulent côte à côte à la même vitesse et dans le même sens. L'une par rapport à l'autre, elles sont :",["au repos","en mouvement","en rotation","en mouvement accéléré"],"La position de l'une par rapport à l'autre ne change pas."],
+["Le conducteur d'un bus qui roule est en mouvement par rapport :",["à la route","à son siège","au volant","aux passagers assis"],"Par rapport à son siège, au volant et aux passagers assis, il est au repos."],
+["La trajectoire d'un point mobile est :",["la ligne qui relie ses positions successives","sa vitesse","la durée de son mouvement","sa masse"],"Elle peut être rectiligne, circulaire ou curviligne."],
+["Si la trajectoire est une droite, elle est dite :",["rectiligne","circulaire","curviligne","uniforme"],"Exemple : une bille qui tombe verticalement."],
+["Si la trajectoire est un cercle, elle est dite :",["circulaire","rectiligne","curviligne","accélérée"],"Exemple : l'extrémité d'une aiguille de montre."],
+["Si la trajectoire est une courbe quelconque, elle est dite :",["curviligne","rectiligne","circulaire","immobile"],"Exemple : une moto dans une série de virages."],
+["La trajectoire de l'extrémité d'une aiguille de montre est :",["circulaire","rectiligne","curviligne","un point"],"Elle décrit un cercle autour de l'axe des aiguilles."],
+["La trajectoire d'un point d'une cabine d'ascenseur est :",["rectiligne","circulaire","curviligne","un cercle"],"La cabine monte et descend en ligne droite."],
+["Les deux types de mouvement d'un solide étudiés en 3AC sont :",["la translation et la rotation","la fusion et la solidification","le repos et l'équilibre","l'oxydation et la combustion"],"Translation : le solide reste parallèle à lui-même ; rotation : il tourne autour d'un axe."],
+["Un solide est en mouvement de translation si tout segment reliant deux de ses points :",["garde la même direction au cours du mouvement","tourne autour d'un axe","change de longueur","reste immobile"],"Le solide reste parallèle à lui-même."],
+["Un solide est en mouvement de rotation autour d'un axe fixe si ses points décrivent :",["des cercles centrés sur l'axe","des droites parallèles","des trajectoires quelconques","un seul point"],"Les points situés sur l'axe restent immobiles."],
+["Dans un mouvement de rotation, les points situés sur l'axe de rotation sont :",["immobiles","les plus rapides","en translation","en mouvement rectiligne"],"Les autres points décrivent des cercles autour de l'axe."],
+["Le mouvement d'un tiroir qu'on ouvre est :",["une translation","une rotation","un repos","une rotation autour d'un axe fixe"],"Tous ses points ont des trajectoires rectilignes parallèles."],
+["Le mouvement d'une porte qu'on ouvre est :",["une rotation","une translation","un mouvement rectiligne","un repos"],"Elle tourne autour de l'axe de ses charnières."],
+["Le mouvement d'une cabine d'ascenseur est :",["une translation","une rotation","un repos","un mouvement circulaire"],"La cabine reste parallèle à elle-même."],
+["Le mouvement des aiguilles d'une montre est :",["une rotation","une translation rectiligne","une translation circulaire","un repos"],"Elles tournent autour d'un axe fixe."],
+["Le mouvement de la roue d'un vélo autour de son axe est :",["une rotation","une translation","un mouvement rectiligne","un repos"],"Chaque point de la roue décrit un cercle autour de l'axe."],
+["Les pales d'un ventilateur en marche sont en mouvement de :",["rotation","translation rectiligne","translation curviligne","repos"],"Elles tournent autour de l'axe du moteur."],
+["La nacelle d'une grande roue reste toujours verticale pendant que la roue tourne. Son mouvement est :",["une translation circulaire","une rotation","une translation rectiligne","un repos"],"Ses points décrivent des cercles, mais la nacelle reste parallèle à elle-même."],
+["Un wagon qui roule sur une voie droite est en mouvement de :",["translation rectiligne","rotation","translation circulaire","repos par rapport à la voie"],"Tous ses points décrivent des droites parallèles."],
+["Dans un mouvement de translation, tous les points du solide ont :",["des trajectoires identiques","des trajectoires circulaires de rayons différents","des vitesses nulles","une position fixe"],"Les trajectoires sont superposables."],
+["La Lune tourne autour de la Terre. Par rapport à la Terre, la trajectoire de son centre est pratiquement :",["circulaire","rectiligne","un point","une droite"],"La Lune décrit presque un cercle autour de la Terre."],
+["Une élève assise dans la classe est, par rapport au Soleil :",["en mouvement","au repos","immobile","sans référentiel"],"La Terre tourne sur elle-même et autour du Soleil."]]},
+{sem:1,name:"La vitesse et la vitesse moyenne",qs:[
+["La vitesse moyenne se calcule par la relation :",["v = d / t","v = d × t","v = t / d","v = d + t"],"C'est la distance parcourue divisée par la durée du parcours."],
+["Dans la relation v = d / t, la lettre d représente :",["la distance parcourue","la durée du parcours","la densité","le diamètre"],"t est la durée du parcours."],
+["L'unité de la vitesse dans le système international est :",["le mètre par seconde (m/s)","le kilomètre par heure (km/h)","le mètre (m)","la seconde (s)"],"Le km/h est une unité usuelle."],
+["1 m/s est égal à :",["3,6 km/h","36 km/h","0,36 km/h","1000 km/h"],"1 m/s = 3600 m par heure = 3,6 km/h."],
+["Pour convertir une vitesse de m/s en km/h, on :",["multiplie par 3,6","divise par 3,6","multiplie par 60","divise par 1000"],"Par exemple 10 m/s = 36 km/h."],
+["Pour convertir une vitesse de km/h en m/s, on :",["divise par 3,6","multiplie par 3,6","multiplie par 1000","divise par 60"],"Par exemple 72 km/h = 20 m/s."],
+["10 m/s correspondent à :",["36 km/h","3,6 km/h","100 km/h","2,8 km/h"],"10 × 3,6 = 36 km/h."],
+["72 km/h correspondent à :",["20 m/s","72 m/s","259,2 m/s","7,2 m/s"],"72 / 3,6 = 20 m/s."],
+["90 km/h correspondent à :",["25 m/s","324 m/s","9 m/s","30 m/s"],"90 / 3,6 = 25 m/s."],
+["30 m/s correspondent à :",["108 km/h","8,3 km/h","30 km/h","300 km/h"],"30 × 3,6 = 108 km/h."],
+["Une voiture parcourt 210 km en 2 h. Sa vitesse moyenne est :",["105 km/h","420 km/h","70 km/h","212 km/h"],"v = 210 / 2 = 105 km/h."],
+["Une voiture parcourt 210 km en 3 h. Sa vitesse moyenne est :",["70 km/h","105 km/h","630 km/h","213 km/h"],"v = 210 / 3 = 70 km/h."],
+["Un coureur parcourt 100 m en 10 s. Sa vitesse moyenne est :",["10 m/s","1000 m/s","0,1 m/s","110 m/s"],"v = 100 / 10 = 10 m/s."],
+["Un cycliste parcourt 40 km en 2 h. Sa vitesse moyenne est :",["20 km/h","80 km/h","42 km/h","38 km/h"],"v = 40 / 2 = 20 km/h."],
+["Un train parcourt 40 km en 30 min. Sa vitesse moyenne est :",["80 km/h","20 km/h","70 km/h","1200 km/h"],"30 min = 0,5 h, donc v = 40 / 0,5 = 80 km/h."],
+["Un élève marche à 1,5 m/s pendant 60 s. Il parcourt :",["90 m","40 m","61,5 m","900 m"],"d = v × t = 1,5 × 60 = 90 m."],
+["Une voiture roule à 80 km/h pendant 3 h. Elle parcourt :",["240 km","83 km","26,7 km","160 km"],"d = v × t = 80 × 3 = 240 km."],
+["Pour parcourir 150 km à la vitesse moyenne de 75 km/h, il faut :",["2 h","0,5 h","75 h","225 h"],"t = d / v = 150 / 75 = 2 h."],
+["Pour calculer la durée d'un parcours, on utilise la relation :",["t = d / v","t = d × v","t = v / d","t = v + d"],"Elle se déduit de v = d / t."],
+["Pour calculer la distance parcourue, on utilise la relation :",["d = v × t","d = v / t","d = t / v","d = v + t"],"Elle se déduit de v = d / t."],
+["La vitesse indiquée par le compteur d'une voiture est :",["la vitesse instantanée","la vitesse moyenne du voyage","la distance parcourue","la durée du trajet"],"C'est la vitesse à un instant précis."],
+["La vitesse mesurée par un radar est :",["la vitesse instantanée","la vitesse moyenne sur tout le trajet","la distance d'arrêt","la durée de réaction"],"Le radar mesure la vitesse à l'instant où le véhicule passe."],
+["Dans un mouvement uniforme, la vitesse :",["reste constante","augmente","diminue","est nulle"],"Le mobile parcourt des distances égales pendant des durées égales."],
+["Dans un mouvement accéléré, la vitesse :",["augmente","diminue","reste constante","est nulle"],"Les distances parcourues pendant des durées égales sont de plus en plus grandes."],
+["Dans un mouvement retardé, la vitesse :",["diminue","augmente","reste constante","devient infinie"],"Les distances parcourues pendant des durées égales sont de plus en plus petites."],
+["Pendant des durées égales, un mobile parcourt des distances égales. Son mouvement est :",["uniforme","accéléré","retardé","circulaire"],"Sa vitesse reste constante."],
+["Pendant des durées égales, un mobile parcourt des distances de plus en plus grandes. Son mouvement est :",["accéléré","retardé","uniforme","au repos"],"Sa vitesse augmente."],
+["Pendant des durées égales, un mobile parcourt des distances de plus en plus petites. Son mouvement est :",["retardé","accéléré","uniforme","au repos"],"Sa vitesse diminue."],
+["Une voiture qui démarre a un mouvement :",["accéléré","retardé","uniforme","de repos"],"Sa vitesse augmente à partir de zéro."],
+["Une voiture qui freine a un mouvement :",["retardé","accéléré","uniforme","de repos"],"Sa vitesse diminue jusqu'à l'arrêt."],
+["La distance d'arrêt d'un véhicule est égale à :",["distance de réaction + distance de freinage","distance de réaction − distance de freinage","distance de freinage seulement","distance de réaction × distance de freinage"],"D(arrêt) = D(réaction) + D(freinage)."],
+["La distance de réaction est la distance parcourue :",["entre le moment où le conducteur voit l'obstacle et le moment où il commence à freiner","pendant le freinage","après l'arrêt du véhicule","avant de voir l'obstacle"],"Pendant ce temps, le véhicule continue à la même vitesse."],
+["La distance de freinage est la distance parcourue :",["entre le début du freinage et l'arrêt complet","avant de voir l'obstacle","pendant le temps de réaction","après l'arrêt"],"Elle dépend de la vitesse, des freins, des pneus et de l'état de la route."],
+["La distance de réaction se calcule par la relation :",["D = v × t (t : temps de réaction)","D = v / t","D = t / v","D = v + t"],"C'est la distance parcourue à la vitesse v pendant le temps de réaction."],
+["Une voiture roule à 20 m/s. Le temps de réaction du conducteur est 1 s. La distance de réaction est :",["20 m","2 m","200 m","21 m"],"D = v × t = 20 × 1 = 20 m."],
+["La distance de réaction est 15 m et la distance de freinage 35 m. La distance d'arrêt est :",["50 m","20 m","35 m","525 m"],"15 + 35 = 50 m."],
+["La distance de réaction augmente si le conducteur :",["est fatigué ou a pris des médicaments","a de bons pneus","roule sur une route sèche","a de bons freins"],"Son temps de réaction est alors plus long."],
+["La distance de freinage augmente si :",["la route est mouillée","la route est sèche","les pneus sont neufs","la vitesse est faible"],"Elle augmente aussi quand la vitesse augmente ou quand les freins sont usés."],
+["Quand la vitesse d'un véhicule augmente, sa distance d'arrêt :",["augmente","diminue","reste la même","devient nulle"],"La distance de réaction et la distance de freinage augmentent toutes les deux."],
+["Pour éviter les accidents de la route, il faut :",["respecter les limitations de vitesse","téléphoner en conduisant","rouler sans ceinture","ignorer les panneaux"],"L'excès de vitesse est l'une des causes principales des accidents."]]},
+{sem:1,name:"Les actions mécaniques et les forces",qs:[
+["Dans une action mécanique, le corps qui exerce l'action s'appelle :",["l'acteur","le receveur","le référentiel","le mobile"],"Le corps qui subit l'action est le receveur."],
+["Dans une action mécanique, le corps qui subit l'action s'appelle :",["le receveur","l'acteur","le référentiel","le dynamomètre"],"Le corps qui exerce l'action est l'acteur."],
+["Le pied d'un joueur frappe un ballon. L'acteur est :",["le pied du joueur","le ballon","le terrain","le but"],"Le ballon est le receveur."],
+["Un aimant attire une bille en acier. Le receveur est :",["la bille","l'aimant","la table","l'air"],"L'aimant est l'acteur."],
+["Une action mécanique peut avoir un effet :",["statique ou dynamique","chimique","électrique","lumineux"],"Elle peut déformer ou maintenir en équilibre, mettre en mouvement ou modifier un mouvement."],
+["Lequel de ces effets est un effet dynamique ?",["mettre un corps en mouvement","déformer un corps","maintenir un corps en équilibre","maintenir un corps immobile"],"Les effets dynamiques concernent le mouvement."],
+["Lequel de ces effets est un effet statique ?",["déformer un corps","mettre un corps en mouvement","modifier la trajectoire d'un corps","modifier la vitesse d'un corps"],"Maintenir un corps en équilibre est aussi un effet statique."],
+["La main qui écrase une boule de pâte a un effet :",["statique : elle déforme la pâte","dynamique : elle modifie la trajectoire","nul","électrique"],"La pâte change de forme."],
+["Un fil qui retient un corps suspendu a pour effet de :",["maintenir le corps en équilibre","mettre le corps en mouvement","déformer le corps","modifier la trajectoire du corps"],"C'est un effet statique."],
+["Un aimant placé près de la trajectoire d'une bille en acier qui roule a pour effet de :",["modifier la trajectoire de la bille","déformer la bille","maintenir la bille en équilibre","ne rien changer"],"C'est un effet dynamique."],
+["Le pied qui frappe un ballon immobile a pour effet de :",["mettre le ballon en mouvement","maintenir le ballon en équilibre","colorer le ballon","ne rien changer"],"C'est un effet dynamique."],
+["Les deux types d'actions mécaniques sont :",["les actions de contact et les actions à distance","les actions lentes et les actions rapides","les actions chaudes et les actions froides","les actions acides et les actions basiques"],"On les distingue selon qu'il y a contact ou non entre l'acteur et le receveur."],
+["Une action de contact s'exerce :",["seulement entre deux corps qui se touchent","entre deux corps éloignés","seulement dans le vide","seulement entre deux aimants"],"Exemple : l'action de la main sur une porte."],
+["Une action à distance s'exerce :",["sans contact entre l'acteur et le receveur","seulement si les corps se touchent","seulement avec un fil","seulement dans l'eau"],"Exemples : l'action d'un aimant, l'attraction de la Terre."],
+["L'action d'un aimant sur une bille en acier est une action :",["à distance","de contact localisée","de contact répartie","impossible"],"L'aimant agit sans toucher la bille."],
+["L'attraction de la Terre sur un corps est une action :",["à distance","de contact localisée","de contact répartie","nulle"],"Elle s'exerce même si le corps ne touche pas le sol."],
+["L'action de la main qui pousse une porte est une action :",["de contact","à distance","magnétique","de gravitation"],"La main touche la porte."],
+["Une action de contact est dite localisée si elle s'exerce :",["sur une très petite surface, assimilable à un point","sur une grande surface","dans tout le volume du corps","sans contact"],"Exemple : l'action d'une aiguille sur un tissu."],
+["Une action de contact est dite répartie si elle s'exerce :",["sur une grande surface","en un seul point","sans contact","seulement à distance"],"Exemple : l'action d'un cahier posé sur une table."],
+["L'action d'une aiguille à coudre sur le tissu est une action de contact :",["localisée","répartie","à distance","nulle"],"La pointe de l'aiguille touche le tissu sur une surface très petite."],
+["L'action de la pointe d'un stylo sur une feuille est une action de contact :",["localisée","répartie","à distance","magnétique"],"La surface de contact est très petite."],
+["L'action d'un cahier posé sur une table est une action de contact :",["répartie","localisée","à distance","nulle"],"Elle s'exerce sur toute la surface de contact."],
+["L'action du vent sur la voile d'un bateau est une action de contact :",["répartie","localisée","à distance","nulle"],"Le vent agit sur toute la surface de la voile."],
+["L'action d'un fil sur un corps suspendu est une action de contact :",["localisée","répartie","à distance","magnétique"],"Elle s'exerce au point d'attache."],
+["Les actions mécaniques à distance sont toujours :",["réparties","localisées","de contact","nulles"],"Elles s'exercent sur tout le volume du corps."],
+["Faire le bilan des actions mécaniques exercées sur un corps, c'est :",["faire la liste de toutes les actions que ce corps subit","mesurer sa masse","calculer sa vitesse","dessiner sa trajectoire"],"On cherche les actions de contact puis les actions à distance."],
+["La première étape du bilan des actions mécaniques est de :",["définir précisément le système étudié","mesurer la vitesse du système","peser le système","chauffer le système"],"On cherche ensuite les actions de contact, puis les actions à distance."],
+["Un livre est posé sur une table. Les actions mécaniques exercées sur le livre sont :",["l'action de la table et l'action de la Terre","l'action de la table seulement","l'action de la Terre seulement","aucune action"],"Une action de contact (la table) et une action à distance (la Terre)."],
+["Une lampe est suspendue au plafond par un fil. Les actions mécaniques exercées sur la lampe sont :",["l'action du fil et l'action de la Terre","l'action du plafond et l'action du sol","l'action du fil seulement","l'action de la Terre seulement"],"Le plafond agit sur le fil, pas directement sur la lampe."],
+["Une bille en acier suspendue à un fil est attirée par un aimant. Sans compter la Terre, les actions exercées sur la bille sont celles :",["du fil (contact) et de l'aimant (à distance)","du fil et de l'aimant (toutes deux de contact)","de l'aimant seulement","du fil seulement"],"Le fil touche la bille ; l'aimant agit sans la toucher."],
+["Une action mécanique est modélisée par une grandeur physique appelée :",["force","masse","vitesse","énergie"],"On la représente par un vecteur."],
+["L'action de l'eau sur la coque d'un bateau qui flotte est une action :",["de contact répartie","de contact localisée","à distance","nulle"],"L'eau agit sur toute la surface immergée de la coque."]]},
+{sem:1,name:"Notion de force",qs:[
+["Une force est caractérisée par :",["quatre caractéristiques","deux caractéristiques","une seule caractéristique","six caractéristiques"],"Point d'application, droite d'action, sens et intensité."],
+["Les quatre caractéristiques d'une force sont :",["le point d'application, la droite d'action, le sens et l'intensité","la masse, le volume, la forme et la couleur","la vitesse, la durée, la distance et la trajectoire","la tension, l'intensité, la résistance et la puissance"],"Ce sont les éléments du vecteur force."],
+["L'intensité d'une force se mesure avec :",["un dynamomètre","une balance","un ohmmètre","un chronomètre"],"La balance mesure la masse."],
+["L'unité internationale de l'intensité d'une force est :",["le newton (N)","le kilogramme (kg)","le watt (W)","le joule (J)"],"Son symbole est N."],
+["Le symbole du newton est :",["N","Ne","Nw","kg"],"On écrit par exemple F = 5 N."],
+["On représente une force par :",["un vecteur","un cercle","un point","une courbe"],"On l'appelle le vecteur force."],
+["L'origine du vecteur force correspond :",["au point d'application de la force","au sens de la force","à l'intensité de la force","à la masse du corps"],"Le vecteur part du point d'application."],
+["La longueur du vecteur force correspond :",["à l'intensité de la force","au point d'application","à la masse du corps","à la durée de l'action"],"On utilise une échelle pour passer des newtons aux centimètres."],
+["Le sens de la flèche du vecteur force correspond :",["au sens de la force","à son intensité","à son point d'application","à sa durée"],"Le sens de la force est celui de l'action modélisée."],
+["La droite d'action d'une force est la droite :",["qui a la direction de la force et passe par son point d'application","qui est perpendiculaire à la force","qui est toujours horizontale","qui est toujours verticale"],"On dit aussi la direction de la force."],
+["Pour une force de contact localisée, le point d'application est :",["le point de contact entre l'acteur et le receveur","le centre de gravité du receveur","le centre de la Terre","un point quelconque"],"Exemple : le point d'attache d'un fil."],
+["Pour une force de contact répartie, le point d'application est :",["le centre de la surface de contact","le centre de gravité du corps","un point de l'acteur","un point quelconque du sol"],"Exemple : l'action d'une table sur un livre."],
+["Pour une force à distance, le point d'application est :",["le centre de gravité du corps","le point de contact","le centre de la surface de contact","le point le plus haut du corps"],"On le note G."],
+["Pour représenter une force, on choisit :",["une échelle","une couleur","une vitesse","une température"],"Par exemple 1 cm pour 2 N."],
+["Avec l'échelle 1 cm pour 2 N, une force de 6 N est représentée par un vecteur de :",["3 cm","12 cm","6 cm","2 cm"],"6 / 2 = 3 cm."],
+["Avec l'échelle 1 cm pour 5 N, un vecteur de 4 cm représente une force de :",["20 N","9 N","1,25 N","4 N"],"4 × 5 = 20 N."],
+["Avec l'échelle 1 cm pour 1 N, une force de 5 N est représentée par un vecteur de :",["5 cm","1 cm","0,2 cm","10 cm"],"5 / 1 = 5 cm."],
+["Avec l'échelle 1 cm pour 10 N, une force de 25 N est représentée par un vecteur de :",["2,5 cm","25 cm","250 cm","0,4 cm"],"25 / 10 = 2,5 cm."],
+["Avec l'échelle 2 cm pour 1 N, une force de 3 N est représentée par un vecteur de :",["6 cm","1,5 cm","3 cm","5 cm"],"3 × 2 = 6 cm."],
+["Une force de 8 N est représentée par un vecteur de 4 cm. L'échelle utilisée est :",["1 cm pour 2 N","1 cm pour 4 N","1 cm pour 8 N","1 cm pour 32 N"],"8 / 4 = 2 N par centimètre."],
+["Un fil tire un corps vers le haut au point A. Le point d'application de la force exercée par le fil est :",["le point A","le centre de gravité du corps","le centre de la Terre","le milieu du fil"],"C'est le point de contact entre le fil et le corps."],
+["Un fil vertical retient un corps suspendu. La force exercée par le fil sur le corps est dirigée :",["vers le haut","vers le bas","horizontalement","dans toutes les directions"],"Le fil tire le corps vers le haut, le long du fil."],
+["La force exercée par un fil tendu sur un corps s'appelle :",["la tension du fil","le poids","la réaction","la poussée"],"On la note souvent T."],
+["La force exercée par une table sur un livre posé dessus s'appelle :",["la réaction de la table","la tension","le poids","la vitesse"],"On la note souvent R."],
+["La force exercée par la Terre sur un corps s'appelle :",["le poids du corps","la tension","la réaction","la masse"],"On la note P."],
+["On note souvent le vecteur poids par la lettre :",["P","T","R","U"],"T désigne souvent la tension d'un fil et R la réaction d'un support."],
+["Deux forces de même intensité sont représentées, à la même échelle, par des vecteurs :",["de même longueur","de même sens obligatoirement","de même origine obligatoirement","de longueurs différentes"],"La longueur du vecteur est proportionnelle à l'intensité."],
+["1 kN (kilonewton) est égal à :",["1000 N","100 N","10 N","0,001 N"],"k signifie kilo, c'est-à-dire 1000."],
+["Un dynamomètre fonctionne grâce :",["à l'allongement d'un ressort","à une pile","à un aimant","à un thermomètre"],"Plus la force est grande, plus le ressort s'allonge."],
+["Un dynamomètre indique 3,5 N. Cette valeur est :",["l'intensité de la force","le point d'application de la force","le sens de la force","la direction de la force"],"Le dynamomètre mesure seulement l'intensité."],
+["La droite d'action d'une force verticale est :",["une droite verticale","une droite horizontale","un cercle","un point"],"La droite d'action a la même direction que la force."],
+["Un cheval tire une charrette vers la droite avec une corde horizontale. La force exercée par la corde sur la charrette a :",["une direction horizontale et un sens vers la droite","une direction verticale et un sens vers le haut","une direction horizontale et un sens vers la gauche","une direction verticale et un sens vers le bas"],"La corde tire la charrette dans le sens du mouvement."]]},
+{sem:1,name:"Équilibre d'un solide soumis à deux forces",qs:[
+["Un solide est en équilibre s'il :",["reste immobile par rapport au référentiel","accélère","tourne de plus en plus vite","tombe"],"On étudie ici l'équilibre d'un solide au repos."],
+["Lorsqu'un solide est en équilibre sous l'action de deux forces, ces deux forces ont :",["la même droite d'action, des sens opposés et la même intensité","le même sens et la même intensité","des droites d'action perpendiculaires","des intensités différentes"],"Ce sont les trois conditions d'équilibre."],
+["Deux forces qui maintiennent un solide en équilibre ont des sens :",["opposés","identiques","perpendiculaires","quelconques"],"Elles se compensent."],
+["Deux forces qui maintiennent un solide en équilibre ont des intensités :",["égales","différentes","nulles","doubles l'une de l'autre"],"F₁ = F₂."],
+["Deux forces qui maintiennent un solide en équilibre ont :",["la même droite d'action","des droites d'action parallèles et distinctes","des droites d'action perpendiculaires","des droites d'action quelconques"],"Sinon le solide se mettrait à tourner."],
+["La condition d'équilibre d'un solide soumis à deux forces s'écrit, avec les vecteurs :",["F₁ + F₂ = 0 (somme vectorielle nulle)","F₁ = F₂ (vecteurs égaux)","F₁ + F₂ = 10 N","F₁ × F₂ = 0"],"Les deux vecteurs sont opposés : F₁ = −F₂."],
+["Si deux forces ont la même intensité et des sens opposés, mais pas la même droite d'action, le solide :",["n'est pas en équilibre : il tourne","reste en équilibre","disparaît","devient plus lourd"],"Les deux forces doivent aussi avoir la même droite d'action."],
+["Si deux forces ont la même droite d'action et le même sens, le solide :",["n'est pas en équilibre","est en équilibre","est forcément immobile","n'a pas de poids"],"Les deux forces s'ajoutent au lieu de se compenser."],
+["Un solide est soumis à deux forces opposées, sur la même droite, d'intensités 3 N et 5 N. Il est :",["non en équilibre","en équilibre","immobile","sans mouvement possible"],"Les intensités ne sont pas égales."],
+["Un solide léger est tiré par deux dynamomètres dans des sens opposés et reste immobile. Le premier indique 4 N. Le second indique :",["4 N","8 N","2 N","0 N"],"À l'équilibre, les deux forces ont la même intensité."],
+["Un corps est suspendu à un fil et reste immobile. Il est soumis :",["à son poids et à la tension du fil","à son poids seulement","à la tension du fil seulement","à aucune force"],"Ces deux forces se compensent."],
+["Un corps suspendu à un fil est en équilibre. Son poids vaut 5 N. La tension du fil vaut :",["5 N","10 N","2,5 N","0 N"],"T = P à l'équilibre."],
+["Un corps suspendu à un fil est en équilibre. La tension du fil est dirigée :",["verticalement vers le haut","verticalement vers le bas","horizontalement","dans le sens du poids"],"Elle est opposée au poids, qui est dirigé vers le bas."],
+["Un corps de masse 0,2 kg est suspendu à un fil (g = 10 N/kg). À l'équilibre, la tension du fil vaut :",["2 N","0,2 N","20 N","10 N"],"P = m × g = 0,2 × 10 = 2 N, et T = P."],
+["Un corps de masse 500 g est suspendu à un dynamomètre (g = 10 N/kg). À l'équilibre, le dynamomètre indique :",["5 N","500 N","0,5 N","50 N"],"m = 0,5 kg ; P = 0,5 × 10 = 5 N."],
+["Un livre posé sur une table horizontale est en équilibre. Il est soumis :",["à son poids et à la réaction de la table","à son poids seulement","à la réaction de la table seulement","à la tension d'un fil"],"La réaction de la table compense le poids."],
+["Un livre de poids 4 N est posé sur une table horizontale. La réaction de la table est :",["verticale, vers le haut, d'intensité 4 N","verticale, vers le bas, d'intensité 4 N","horizontale, d'intensité 4 N","verticale, vers le haut, d'intensité 8 N"],"Elle est opposée au poids et de même intensité."],
+["Pour un livre en équilibre sur une table, le poids et la réaction de la table ont :",["la même droite d'action verticale","des droites d'action perpendiculaires","le même sens","des intensités différentes"],"Cette droite passe par le centre de gravité du livre."],
+["Un solide en équilibre sur une table est soumis à une réaction R = 12 N. Son poids vaut :",["12 N","24 N","6 N","0 N"],"P = R à l'équilibre."],
+["Un solide en équilibre sur une table est soumis à une réaction R = 30 N (g = 10 N/kg). Sa masse est :",["3 kg","30 kg","300 kg","0,3 kg"],"P = R = 30 N, donc m = P / g = 30 / 10 = 3 kg."],
+["Un corps suspendu à un ressort est en équilibre. Les deux forces exercées sur lui sont :",["son poids et la tension du ressort","son poids et la réaction de la table","la tension du ressort seulement","deux poids"],"La tension du ressort est dirigée vers le haut."],
+["Un bateau immobile flotte sur l'eau. Il est en équilibre sous l'action :",["de son poids et de l'action de l'eau","de son poids seulement","de l'action de l'eau seulement","de l'action du vent seulement"],"L'action de l'eau est verticale, vers le haut, de même intensité que le poids."],
+["À l'équilibre, les vecteurs qui représentent les deux forces ont :",["la même longueur et des sens opposés","la même longueur et le même sens","des longueurs différentes","des directions perpendiculaires"],"Ils sont portés par la même droite."],
+["Avec l'échelle 1 cm pour 2 N, on représente un poids de 4 N et la tension du fil à l'équilibre. Chaque vecteur mesure :",["2 cm","4 cm","8 cm","1 cm"],"4 / 2 = 2 cm pour chacune des deux forces."],
+["Un lustre de poids 20 N est suspendu au plafond par une chaîne. À l'équilibre, la chaîne exerce sur le lustre une force de :",["20 N vers le haut","20 N vers le bas","10 N vers le haut","40 N vers le haut"],"Elle compense exactement le poids."],
+["On coupe le fil qui retient un corps suspendu. Le corps :",["n'est plus en équilibre : il tombe","reste en équilibre","monte","reste immobile dans l'air"],"Il n'est plus soumis qu'à son poids."],
+["Un corps suspendu à un fil est en équilibre. La droite d'action commune au poids et à la tension est :",["la verticale passant par le centre de gravité","une droite horizontale","une droite inclinée","une droite quelconque"],"Le fil se place de lui-même sur cette verticale."],
+["Un solide soumis à deux forces est en équilibre. Si l'on double l'intensité d'une seule des deux forces, le solide :",["n'est plus en équilibre","reste en équilibre","devient plus léger","ne subit plus aucune force"],"Les deux intensités ne sont plus égales."],
+["Deux équipes tirent sur une corde en sens opposés et la corde reste immobile. Les deux équipes exercent des forces :",["de même intensité","d'intensités différentes","nulles","de même sens"],"Les deux forces se compensent."],
+["Un corps est en équilibre sous l'action de deux forces F₁ et F₂. Si F₁ est dirigée vers la droite, alors F₂ est dirigée :",["vers la gauche","vers la droite","vers le haut","vers le bas"],"Elle a la même droite d'action et le sens opposé."],
+["Un corps est en équilibre sous l'action de deux forces. Si F₁ = 7 N, alors F₂ vaut :",["7 N","14 N","3,5 N","0 N"],"Les deux forces ont la même intensité."],
+["Pour étudier l'équilibre d'un solide, on commence par :",["faire le bilan des forces exercées sur le solide","mesurer sa vitesse","le chauffer","calculer son volume"],"On cherche les forces de contact puis les forces à distance."]]},
+{sem:1,name:"Le poids et la masse",qs:[
+["Le poids d'un corps est :",["la force d'attraction exercée par la Terre sur ce corps","la quantité de matière du corps","le volume du corps","la vitesse du corps"],"La quantité de matière, c'est la masse."],
+["Le poids est une force :",["à distance","de contact localisée","de contact répartie","qui n'existe que sur le sol"],"La Terre attire les corps sans les toucher."],
+["Le point d'application du poids est :",["le centre de gravité du corps","le point le plus haut du corps","le point de contact avec le sol","le centre de la Terre"],"On le note G."],
+["La droite d'action du poids est :",["la verticale passant par le centre de gravité","une droite horizontale","une droite inclinée","une droite quelconque"],"C'est la direction indiquée par un fil à plomb."],
+["Le sens du poids est :",["vers le bas, vers le centre de la Terre","vers le haut","vers la droite","vers le nord"],"Le poids fait tomber les corps."],
+["L'intensité du poids se mesure avec :",["un dynamomètre","une balance","une éprouvette","un voltmètre"],"La balance mesure la masse."],
+["L'unité de l'intensité du poids est :",["le newton (N)","le kilogramme (kg)","le gramme (g)","le N/kg"],"Le poids est une force."],
+["La masse d'un corps se mesure avec :",["une balance","un dynamomètre","un chronomètre","un ohmmètre"],"Le dynamomètre mesure l'intensité des forces."],
+["L'unité internationale de la masse est :",["le kilogramme (kg)","le newton (N)","le gramme (g)","le litre (L)"],"Son symbole est kg."],
+["La masse d'un corps :",["ne dépend pas du lieu","change avec l'altitude","est nulle sur la Lune","dépend de la latitude"],"C'est une grandeur constante."],
+["L'intensité du poids d'un corps :",["change selon le lieu","est la même partout","ne dépend pas de la masse","est toujours égale à la masse"],"Elle varie avec l'altitude et la latitude."],
+["La relation entre l'intensité du poids et la masse est :",["P = m × g","P = m / g","P = g / m","P = m + g"],"P en newtons, m en kilogrammes, g en N/kg."],
+["Dans la relation P = m × g, la lettre g représente :",["l'intensité de la pesanteur","la masse en grammes","le centre de gravité","la vitesse du corps"],"Elle s'exprime en N/kg."],
+["L'intensité de la pesanteur g s'exprime en :",["N/kg","kg/N","N","kg"],"g = P / m."],
+["Au niveau de la mer, l'intensité de la pesanteur vaut environ :",["9,81 N/kg","1,6 N/kg","98,1 N/kg","0,98 N/kg"],"On prend souvent g = 10 N/kg pour simplifier les calculs."],
+["Un corps a une masse de 5 kg (g = 10 N/kg). Son poids vaut :",["50 N","5 N","0,5 N","15 N"],"P = 5 × 10 = 50 N."],
+["Un corps a une masse de 300 g (g = 10 N/kg). Son poids vaut :",["3 N","3000 N","30 N","0,3 N"],"m = 0,3 kg, donc P = 0,3 × 10 = 3 N."],
+["Un corps a un poids de 8 N (g = 10 N/kg). Sa masse est :",["0,8 kg","80 kg","8 kg","18 kg"],"m = P / g = 8 / 10 = 0,8 kg."],
+["Un corps a un poids de 300 N (g = 10 N/kg). Sa masse est :",["30 kg","3000 kg","300 kg","3 kg"],"m = P / g = 300 / 10 = 30 kg."],
+["Un élève a une masse de 50 kg (g = 9,8 N/kg). Son poids vaut :",["490 N","50 N","5,1 N","59,8 N"],"P = 50 × 9,8 = 490 N."],
+["En un lieu, un corps de masse 2 kg a un poids de 19,6 N. L'intensité de la pesanteur en ce lieu est :",["9,8 N/kg","39,2 N/kg","17,6 N/kg","0,1 N/kg"],"g = P / m = 19,6 / 2 = 9,8 N/kg."],
+["Pour calculer la masse à partir du poids, on utilise :",["m = P / g","m = P × g","m = g / P","m = P − g"],"Elle se déduit de P = m × g."],
+["La courbe représentant le poids P en fonction de la masse m est :",["une droite passant par l'origine","une droite horizontale","un cercle","une courbe en cloche"],"Le poids est proportionnel à la masse."],
+["En un lieu donné, le rapport P / m est :",["constant","variable d'un corps à l'autre","toujours égal à 1","nul"],"Ce rapport est l'intensité de la pesanteur g."],
+["Quand l'altitude augmente, l'intensité du poids d'un corps :",["diminue","augmente","reste la même","devient infinie"],"g diminue quand on s'éloigne du centre de la Terre."],
+["Quand on se déplace de l'équateur vers les pôles, l'intensité du poids d'un corps :",["augmente","diminue","reste la même","s'annule"],"g vaut 9,78 N/kg à l'équateur et 9,83 N/kg au pôle Nord."],
+["L'intensité de la pesanteur est la plus grande :",["aux pôles","à l'équateur","à Casablanca","au sommet d'une montagne"],"g vaut environ 9,83 N/kg aux pôles."],
+["Sur la Lune, la masse d'un astronaute est :",["la même que sur la Terre","six fois plus petite","nulle","six fois plus grande"],"La masse ne dépend pas du lieu."],
+["Sur la Lune, le poids d'un astronaute est :",["plus petit que sur la Terre","le même que sur la Terre","plus grand que sur la Terre","nul"],"L'intensité de la pesanteur sur la Lune est environ six fois plus faible."],
+["Sur la Lune, g vaut environ 1,6 N/kg. Le poids d'un objet de 10 kg y est :",["16 N","100 N","10 N","1,6 N"],"P = 10 × 1,6 = 16 N."],
+["Un objet a une masse de 2 kg sur la Terre. Sur la Lune, sa masse est :",["2 kg","0,33 kg","12 kg","3,2 kg"],"La masse est la même partout."],
+["Un dynamomètre indique 2 N pour un corps suspendu (g = 10 N/kg). La masse de ce corps est :",["200 g","2 kg","20 g","20 kg"],"m = P / g = 2 / 10 = 0,2 kg = 200 g."],
+["Avec l'échelle 1 cm pour 10 N, le poids d'un corps de masse 3 kg (g = 10 N/kg) est représenté par un vecteur de :",["3 cm","30 cm","10 cm","0,3 cm"],"P = 30 N, donc 30 / 10 = 3 cm."],
+["Le vecteur poids est représenté par une flèche :",["verticale, dirigée vers le bas, partant du centre de gravité","horizontale, partant du centre de gravité","verticale, dirigée vers le haut","partant du point de contact avec le sol"],"Il part du centre de gravité G."],
+["Si la masse d'un corps double, au même lieu, son poids :",["double","est divisé par deux","ne change pas","est multiplié par quatre"],"Le poids est proportionnel à la masse."],
+["Un sac de 1 kg a, sur la Terre, un poids d'environ :",["10 N","1 N","100 N","0,1 N"],"P = 1 × 9,81 ≈ 10 N."]]},
+{sem:1,name:"La loi d'Ohm",qs:[
+["Un conducteur ohmique est un dipôle qui :",["s'oppose au passage du courant électrique","produit du courant électrique","mesure la tension","stocke l'énergie électrique"],"Il est caractérisé par sa résistance R."],
+["La grandeur qui caractérise un conducteur ohmique est :",["sa résistance","sa masse","sa couleur","sa longueur"],"Elle est notée R."],
+["L'unité internationale de la résistance électrique est :",["l'ohm (Ω)","le volt (V)","l'ampère (A)","le watt (W)"],"Son symbole est la lettre grecque oméga."],
+["1 kΩ est égal à :",["1000 Ω","100 Ω","0,001 Ω","1 000 000 Ω"],"k signifie kilo."],
+["1 MΩ est égal à :",["1 000 000 Ω","1000 Ω","0,001 Ω","100 Ω"],"M signifie méga, c'est-à-dire un million."],
+["4,7 kΩ correspondent à :",["4700 Ω","47 Ω","470 Ω","0,0047 Ω"],"4,7 × 1000 = 4700 Ω."],
+["Pour mesurer directement une résistance, on utilise :",["un ohmmètre","un ampèremètre","un voltmètre","un dynamomètre"],"La plupart des multimètres ont une fonction ohmmètre."],
+["Pour mesurer une résistance, on branche l'ohmmètre :",["aux bornes du conducteur ohmique","en série avec une pile","dans un circuit fermé alimenté","sur une seule borne"],"Le conducteur ohmique doit être hors circuit."],
+["On peut aussi déterminer la valeur d'une résistance grâce :",["au code des couleurs","à sa masse","à sa température","à sa longueur"],"Les anneaux colorés indiquent la valeur de la résistance."],
+["Dans le code des couleurs, le premier anneau indique :",["le premier chiffre","le nombre de zéros","la tolérance","la tension maximale"],"Le deuxième anneau donne le deuxième chiffre."],
+["Dans le code des couleurs, le troisième anneau indique :",["le nombre de zéros à ajouter","le premier chiffre","la tolérance","l'intensité maximale"],"C'est le multiplicateur."],
+["Dans le code des couleurs, le quatrième anneau indique :",["la tolérance (précision)","le premier chiffre","le nombre de zéros","la puissance"],"Il indique la précision de la valeur marquée."],
+["Dans le code des couleurs, le noir correspond au chiffre :",["0","1","2","9"],"Noir 0, marron 1, rouge 2, orange 3, jaune 4, vert 5, bleu 6, violet 7, gris 8, blanc 9."],
+["Dans le code des couleurs, le rouge correspond au chiffre :",["2","0","5","7"],"Noir 0, marron 1, rouge 2."],
+["Dans le code des couleurs, le vert correspond au chiffre :",["5","3","6","8"],"Jaune 4, vert 5, bleu 6."],
+["Une résistance porte les anneaux marron, noir, rouge. Sa valeur est :",["1000 Ω","102 Ω","100 Ω","12 Ω"],"Marron 1, noir 0, rouge : deux zéros, soit 1000 Ω."],
+["Une résistance porte les anneaux rouge, rouge, marron. Sa valeur est :",["220 Ω","221 Ω","22 Ω","2200 Ω"],"Rouge 2, rouge 2, marron : un zéro, soit 220 Ω."],
+["Une résistance porte les anneaux jaune, violet, rouge. Sa valeur est :",["4700 Ω","472 Ω","470 Ω","47 Ω"],"Jaune 4, violet 7, rouge : deux zéros, soit 4700 Ω."],
+["La loi d'Ohm s'écrit :",["U = R × I","U = R / I","U = I / R","U = R + I"],"U en volts, R en ohms, I en ampères."],
+["Dans la loi d'Ohm U = R × I, l'intensité I s'exprime en :",["ampères (A)","volts (V)","ohms (Ω)","watts (W)"],"Si l'intensité est donnée en mA, il faut la convertir en A."],
+["D'après la loi d'Ohm, la résistance se calcule par :",["R = U / I","R = U × I","R = I / U","R = U − I"],"Elle se déduit de U = R × I."],
+["D'après la loi d'Ohm, l'intensité se calcule par :",["I = U / R","I = U × R","I = R / U","I = U − R"],"Elle se déduit de U = R × I."],
+["Un conducteur ohmique de résistance 100 Ω est traversé par un courant de 0,2 A. La tension à ses bornes est :",["20 V","500 V","0,002 V","100,2 V"],"U = R × I = 100 × 0,2 = 20 V."],
+["Un conducteur ohmique de résistance 220 Ω est traversé par un courant de 50 mA. La tension à ses bornes est :",["11 V","11 000 V","4,4 V","270 V"],"50 mA = 0,05 A, donc U = 220 × 0,05 = 11 V."],
+["La tension aux bornes d'un conducteur ohmique est 12 V et sa résistance est 60 Ω. L'intensité du courant est :",["0,2 A","5 A","720 A","72 A"],"I = U / R = 12 / 60 = 0,2 A."],
+["La tension aux bornes d'un conducteur ohmique est 6 V et l'intensité du courant est 0,03 A. Sa résistance est :",["200 Ω","0,18 Ω","18 Ω","2 Ω"],"R = U / I = 6 / 0,03 = 200 Ω."],
+["La tension aux bornes d'un conducteur ohmique est 9 V et l'intensité du courant est 0,5 A. Sa résistance est :",["18 Ω","4,5 Ω","9,5 Ω","0,056 Ω"],"R = U / I = 9 / 0,5 = 18 Ω."],
+["La caractéristique U = f(I) d'un conducteur ohmique est :",["une droite passant par l'origine","une droite horizontale","une courbe en cloche","un cercle"],"La tension est proportionnelle à l'intensité."],
+["Pour un conducteur ohmique, la tension à ses bornes et l'intensité du courant sont :",["proportionnelles","égales","sans relation","inversement proportionnelles"],"Le quotient U / I reste constant : c'est la résistance R."],
+["Pour un conducteur ohmique, si la tension à ses bornes double, l'intensité du courant :",["double","est divisée par deux","ne change pas","s'annule"],"U et I sont proportionnelles."],
+["Sur la caractéristique d'un conducteur ohmique, on lit U = 5 V pour I = 0,2 A. Sa résistance est :",["25 Ω","1 Ω","5,2 Ω","0,04 Ω"],"R = U / I = 5 / 0,2 = 25 Ω."],
+["Sous une même tension, plus la résistance d'un conducteur ohmique est grande, plus l'intensité du courant est :",["petite","grande","dangereuse","égale à la tension"],"I = U / R."],
+["Pour tracer la caractéristique d'un conducteur ohmique, on mesure :",["la tension avec un voltmètre et l'intensité avec un ampèremètre","la masse avec une balance","la résistance avec un dynamomètre","la durée avec un chronomètre"],"Le voltmètre est branché en dérivation et l'ampèremètre en série."],
+["Un conducteur ohmique de résistance 1 kΩ est soumis à une tension de 10 V. L'intensité du courant est :",["0,01 A","10 A","10 000 A","0,1 A"],"I = U / R = 10 / 1000 = 0,01 A, soit 10 mA."]]},
+{sem:1,name:"La puissance électrique",qs:[
+["La puissance électrique est notée par la lettre :",["P","U","E","R"],"U est la tension, E l'énergie et R la résistance."],
+["L'unité internationale de la puissance électrique est :",["le watt (W)","le joule (J)","le volt (V)","le kilowattheure (kWh)"],"Son symbole est W."],
+["1 kW est égal à :",["1000 W","100 W","0,001 W","1 000 000 W"],"k signifie kilo."],
+["1 MW (mégawatt) est égal à :",["1 000 000 W","1000 W","0,001 W","100 W"],"M signifie méga, c'est-à-dire un million."],
+["1 mW (milliwatt) est égal à :",["0,001 W","1000 W","0,1 W","1 000 000 W"],"m signifie milli, c'est-à-dire un millième."],
+["3 kW correspondent à :",["3000 W","300 W","0,003 W","30 W"],"3 × 1000 = 3000 W."],
+["1200 W correspondent à :",["1,2 kW","12 kW","120 kW","0,12 kW"],"1200 / 1000 = 1,2 kW."],
+["Une lampe porte les indications (220 V – 100 W). La valeur 100 W est :",["sa puissance nominale","sa tension nominale","son intensité nominale","sa résistance"],"C'est la puissance consommée en fonctionnement normal."],
+["Une lampe porte les indications (220 V – 100 W). La valeur 220 V est :",["sa tension nominale","sa puissance nominale","son intensité nominale","son énergie"],"C'est la tension qu'il faut appliquer pour un fonctionnement normal."],
+["Sous la même tension de 220 V, la lampe qui brille le plus est celle de :",["100 W","40 W","25 W","15 W"],"Plus la puissance est grande, plus l'effet produit est important."],
+["La puissance électrique consommée par un appareil se calcule par :",["P = U × I","P = U / I","P = I / U","P = U + I"],"P en watts, U en volts, I en ampères."],
+["D'après P = U × I, l'intensité se calcule par :",["I = P / U","I = P × U","I = U / P","I = P − U"],"C'est l'intensité du courant qui traverse l'appareil."],
+["D'après P = U × I, la tension se calcule par :",["U = P / I","U = P × I","U = I / P","U = P + I"],"C'est la tension aux bornes de l'appareil."],
+["Une lampe fonctionne sous 12 V et est traversée par un courant de 2 A. Sa puissance est :",["24 W","6 W","14 W","10 W"],"P = U × I = 12 × 2 = 24 W."],
+["Un appareil fonctionne sous 220 V et est traversé par un courant de 5 A. Sa puissance est :",["1100 W","44 W","225 W","215 W"],"P = 220 × 5 = 1100 W."],
+["Un fer à repasser de 2200 W fonctionne sous 220 V. L'intensité du courant qui le traverse est :",["10 A","0,1 A","484 000 A","1980 A"],"I = P / U = 2200 / 220 = 10 A."],
+["Une lampe de 100 W fonctionne sous 220 V. L'intensité du courant qui la traverse est environ :",["0,45 A","2,2 A","22 000 A","120 A"],"I = P / U = 100 / 220 ≈ 0,45 A."],
+["Une lampe (6 V – 3 W) fonctionne normalement. L'intensité du courant qui la traverse est :",["0,5 A","2 A","18 A","9 A"],"I = P / U = 3 / 6 = 0,5 A."],
+["Un appareil de puissance 60 W est traversé par un courant de 5 A. La tension à ses bornes est :",["12 V","300 V","65 V","55 V"],"U = P / I = 60 / 5 = 12 V."],
+["En fonction de R et de I, la puissance d'un appareil de chauffage s'écrit :",["P = R × I²","P = R / I²","P = R + I","P = I / R"],"On remplace U par R × I dans P = U × I."],
+["En fonction de U et de R, la puissance d'un appareil de chauffage s'écrit :",["P = U² / R","P = U × R","P = R / U²","P = U / R"],"On remplace I par U / R dans P = U × I."],
+["Un conducteur ohmique de résistance 50 Ω est traversé par un courant de 2 A. La puissance consommée est :",["200 W","100 W","25 W","52 W"],"P = R × I² = 50 × 2² = 50 × 4 = 200 W."],
+["Un radiateur de résistance 484 Ω fonctionne sous 220 V. Sa puissance est :",["100 W","2,2 W","704 W","106 480 W"],"P = U² / R = 48 400 / 484 = 100 W."],
+["Un conducteur ohmique de résistance 10 Ω est soumis à une tension de 20 V. La puissance consommée est :",["40 W","200 W","2 W","30 W"],"P = U² / R = 400 / 10 = 40 W."],
+["Les caractéristiques nominales d'un appareil électrique sont inscrites sur :",["sa plaque signalétique","son interrupteur","son fusible","sa facture"],"On y lit la tension, la puissance et parfois l'intensité nominales."],
+["La tension nominale d'un appareil est la tension :",["qu'il faut appliquer pour qu'il fonctionne normalement","maximale du secteur","qui détruit l'appareil","mesurée quand l'appareil est éteint"],"Elle s'exprime en volts."],
+["La puissance nominale d'un appareil est la puissance :",["qu'il consomme en fonctionnement normal","qu'il produit à l'arrêt","maximale du compteur","du fusible"],"Elle s'exprime en watts."],
+["Une lampe (12 V – 21 W) est branchée sous 6 V. Elle :",["brille faiblement","brille normalement","brille trop fort","grille aussitôt"],"La tension appliquée est inférieure à sa tension nominale."],
+["Une lampe (6 V – 3 W) est branchée sous 12 V. Elle :",["risque de griller","brille faiblement","brille normalement","ne s'allume pas"],"La tension appliquée est supérieure à sa tension nominale."],
+["Dans une installation domestique, la puissance totale consommée est :",["la somme des puissances des appareils qui fonctionnent en même temps","la puissance du plus gros appareil","toujours égale à 220 W","le produit des puissances"],"P(totale) = P₁ + P₂ + P₃ + …"],
+["On fait fonctionner en même temps un four (2000 W), un fer à repasser (1200 W) et une lampe (100 W). La puissance totale est :",["3300 W","2000 W","1300 W","3200 W"],"2000 + 1200 + 100 = 3300 W."],
+["Plus on branche d'appareils en dérivation sur une même ligne, plus l'intensité du courant dans cette ligne :",["augmente","diminue","reste la même","s'annule"],"Il y a alors un risque d'échauffement des fils et d'incendie."],
+["Pour protéger une installation électrique contre une intensité trop grande, on utilise :",["des fusibles ou un disjoncteur","des lampes plus puissantes","des fils plus fins","des multiprises"],"Ils coupent le courant quand l'intensité dépasse une valeur limite."],
+["Une prise protégée par un fusible de 10 A sous 220 V peut alimenter au maximum une puissance de :",["2200 W","22 W","230 W","210 W"],"P = U × I = 220 × 10 = 2200 W."],
+["Parmi ces appareils, celui qui a la plus grande puissance est en général :",["le four électrique","la lampe économique","le chargeur de téléphone","la radio"],"Les appareils de chauffage ont des puissances de l'ordre du kilowatt."],
+["Une lampe économique de 20 W éclaire autant qu'une lampe à incandescence de 100 W. Elle est donc :",["plus économique en énergie","plus dangereuse","plus consommatrice","inutilisable sous 220 V"],"Elle consomme cinq fois moins de puissance pour le même éclairage."]]},
+{sem:1,name:"L'énergie électrique",qs:[
+["L'énergie électrique est notée par la lettre :",["E","P","U","R"],"P est la puissance, U la tension et R la résistance."],
+["L'unité internationale de l'énergie est :",["le joule (J)","le watt (W)","le volt (V)","l'ampère (A)"],"Son symbole est J."],
+["L'énergie électrique consommée par une installation domestique est mesurée par :",["le compteur électrique","le disjoncteur","le fusible","le voltmètre"],"Il est installé à l'entrée de l'installation."],
+["L'énergie électrique consommée par un appareil se calcule par :",["E = P × t","E = P / t","E = t / P","E = P + t"],"P est la puissance de l'appareil et t la durée de fonctionnement."],
+["Dans E = P × t, si P est en watts et t en secondes, E s'exprime en :",["joules (J)","wattheures (Wh)","kilowattheures (kWh)","watts (W)"],"1 J = 1 W × 1 s."],
+["Dans E = P × t, si P est en watts et t en heures, E s'exprime en :",["wattheures (Wh)","joules (J)","kilowattheures (kWh)","volts (V)"],"1 Wh = 1 W × 1 h."],
+["Dans E = P × t, si P est en kilowatts et t en heures, E s'exprime en :",["kilowattheures (kWh)","joules (J)","wattheures (Wh)","watts (W)"],"C'est l'unité utilisée sur les factures d'électricité."],
+["1 Wh est égal à :",["3600 J","60 J","1000 J","3,6 J"],"1 Wh = 1 W × 3600 s = 3600 J."],
+["Exprimé en wattheures, 1 kWh est égal à :",["1000 Wh","100 Wh","3600 Wh","0,001 Wh"],"k signifie kilo."],
+["Exprimé en joules, 1 kWh est égal à :",["3 600 000 J","3600 J","1000 J","360 J"],"1 kWh = 1000 W × 3600 s = 3,6 × 10⁶ J."],
+["1 kJ est égal à :",["1000 J","100 J","3600 J","0,001 J"],"k signifie kilo."],
+["Une lampe de 100 W fonctionne pendant 5 h. Elle consomme :",["500 Wh","20 Wh","105 Wh","5000 Wh"],"E = P × t = 100 × 5 = 500 Wh, soit 0,5 kWh."],
+["Un fer à repasser de 1000 W fonctionne pendant 2 h. Il consomme :",["2 kWh","500 kWh","2000 kWh","0,5 kWh"],"E = 1 kW × 2 h = 2 kWh."],
+["Un radiateur de 2 kW fonctionne pendant 3 h. Il consomme :",["6 kWh","1,5 kWh","5 kWh","6000 kWh"],"E = P × t = 2 × 3 = 6 kWh."],
+["Une lampe de 75 W fonctionne pendant 2 h. Elle consomme :",["150 Wh","37,5 Wh","77 Wh","1500 Wh"],"E = 75 × 2 = 150 Wh."],
+["Une lampe de 60 W fonctionne pendant 1 min. Elle consomme :",["3600 J","60 J","1 J","360 J"],"1 min = 60 s, donc E = 60 × 60 = 3600 J."],
+["Un téléviseur de 100 W fonctionne pendant 10 h. Il consomme :",["1 kWh","10 kWh","100 kWh","0,1 kWh"],"E = 100 × 10 = 1000 Wh = 1 kWh."],
+["Une bouilloire de 2000 W fonctionne pendant 30 min. Elle consomme :",["1 kWh","60 kWh","4 kWh","0,06 kWh"],"30 min = 0,5 h, donc E = 2 kW × 0,5 h = 1 kWh."],
+["Un appareil a consommé 1,5 kWh en 3 h. Sa puissance est :",["500 W","4500 W","1500 W","50 W"],"P = E / t = 1,5 / 3 = 0,5 kW = 500 W."],
+["Un appareil de 1 kW a consommé 2 kWh. Il a fonctionné pendant :",["2 h","0,5 h","3 h","20 h"],"t = E / P = 2 / 1 = 2 h."],
+["D'après E = P × t, la puissance se calcule par :",["P = E / t","P = E × t","P = t / E","P = E − t"],"C'est l'énergie consommée par unité de temps."],
+["Quand un appareil fonctionne, le disque du compteur électrique :",["tourne","reste immobile","s'éteint","chauffe"],"Plus la puissance consommée est grande, plus il tourne vite."],
+["La constante C d'un compteur électrique est :",["l'énergie consommée pendant un tour du disque","la tension du secteur","la puissance maximale","le prix du kWh"],"Elle s'exprime en Wh par tour."],
+["L'énergie consommée quand le disque du compteur fait n tours est :",["E = n × C","E = n / C","E = C / n","E = n + C"],"C est la constante du compteur."],
+["La constante d'un compteur est C = 2 Wh par tour. Le disque fait 50 tours. L'énergie consommée est :",["100 Wh","25 Wh","52 Wh","48 Wh"],"E = n × C = 50 × 2 = 100 Wh."],
+["La constante d'un compteur est C = 2,5 Wh par tour. Une énergie de 250 Wh correspond à :",["100 tours","625 tours","10 tours","252,5 tours"],"n = E / C = 250 / 2,5 = 100 tours."],
+["Sur une facture, l'ancien index est 12 709 kWh et le nouvel index est 12 870 kWh. L'énergie consommée est :",["161 kWh","25 579 kWh","171 kWh","151 kWh"],"12 870 − 12 709 = 161 kWh."],
+["L'énergie consommée entre deux factures se calcule par :",["nouvel index − ancien index","nouvel index + ancien index","nouvel index × ancien index","ancien index − nouvel index"],"Les index sont lus sur le compteur."],
+["Un foyer consomme 150 kWh. Le prix du kWh est 1,2 DH. Le prix de l'énergie consommée, sans les taxes, est :",["180 DH","125 DH","151,2 DH","148,8 DH"],"150 × 1,2 = 180 DH."],
+["Le montant total d'une facture d'électricité est égal :",["au prix de l'énergie consommée plus les taxes","au nouvel index","à la puissance du compteur","au nombre de lampes"],"Prix de l'énergie = énergie en kWh × prix d'un kWh."],
+["Un appareil de chauffage transforme presque toute l'énergie électrique consommée en :",["énergie thermique (chaleur)","énergie lumineuse","énergie chimique","énergie de mouvement"],"C'est l'effet Joule dans le conducteur ohmique."],
+["L'énergie consommée par un appareil de chauffage de résistance R s'écrit :",["E = R × I² × t","E = R × I × t","E = R / (I² × t)","E = R + I + t"],"Car P = R × I² et E = P × t."],
+["Un conducteur ohmique de résistance 100 Ω est traversé par un courant de 2 A pendant 10 s. L'énergie consommée est :",["4000 J","2000 J","400 J","112 J"],"E = R × I² × t = 100 × 4 × 10 = 4000 J."],
+["Un radiateur fonctionne sous 220 V et est traversé par un courant de 5 A pendant 2 h. L'énergie consommée est :",["2,2 kWh","1,1 kWh","2200 kWh","0,55 kWh"],"P = 220 × 5 = 1100 W = 1,1 kW ; E = 1,1 × 2 = 2,2 kWh."],
+["Pour économiser l'énergie électrique à la maison, on peut :",["éteindre les appareils inutilisés et utiliser des lampes économiques","laisser les lampes allumées","ouvrir souvent le réfrigérateur","utiliser des lampes plus puissantes"],"Moins de puissance et moins de durée : moins d'énergie consommée."],
+["À puissance égale, l'énergie consommée par un appareil est d'autant plus grande que :",["sa durée de fonctionnement est longue","sa durée de fonctionnement est courte","sa couleur est foncée","son fil est long"],"E = P × t."]]}
+]}};
+
+const QN=10, LETTERS="ABCD", SALT="laboqcm-pc-2026";
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const starsOf=p=>p>=.9?3:p>=.7?2:p>=.5?1:0;
+const starsHTML=n=>[0,1,2].map(i=>`<span class="${i<n?"":"off"}">★</span>`).join("");
+const $app=document.getElementById("app");
+const setColor=l=>$app.style.setProperty("--lc",BANK[l].color);
+const clean=s=>String(s).replace(/[|]/g," ").replace(/\s+/g," ").trim();
+const norm=s=>clean(s).toLowerCase();
+function copyText(text,btn){
+  const done=()=>{const t=btn.textContent;btn.textContent="Copié ✓";setTimeout(()=>btn.textContent=t,1600)};
+  const fallback=()=>{const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");done()}catch(e){btn.textContent="Sélectionnez le texte pour le copier"}ta.remove()};
+  try{navigator.clipboard.writeText(text).then(done,fallback)}catch(e){fallback()}
+}
+function toQuestions(pool,n){return shuffle(pool).slice(0,n).map(({q,ch})=>({text:q[0],answer:q[1][0],opts:shuffle(q[1]),exp:q[2],ch}))}
+function poolOf(level,idx){const L=BANK[level];return idx.flatMap(i=>L.chapters[i].qs.map(q=>({q,ch:L.chapters[i].name})))}
+
+/* ---------- Codes de quiz : "3AC-ADF" = 3AC, leçons A, D et F (A = leçon 1) ---------- */
+const ABC="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const makeCode=(level,idx)=>level+"-"+idx.slice().sort((a,b)=>a-b).map(i=>ABC[i]).join("");
+function parseCode(c){
+  c=String(c||"").trim().toUpperCase().replace(/\s+/g,"");
+  const m=c.match(/^(3AC)-?([A-Z]+)$/);if(!m)return null;
+  const L=BANK[m[1]];const idx=[...new Set(m[2].split("").map(d=>ABC.indexOf(d)))].sort((a,b)=>a-b);
+  if(idx.some(i=>i>=L.chapters.length))return null;
+  const n=idx.reduce((t,i)=>t+L.chapters[i].qs.length,0);
+  return{level:m[1],idx,code:makeCode(m[1],idx),n};
+}
+/* ---------- Signature des résultats (empêche de modifier la note dans le message) ---------- */
+function hash(s){let h=2166136261;for(const ch of s){h^=ch.codePointAt(0);h=Math.imul(h,16777619)>>>0}
+  let h2=h;for(const ch of s+SALT){h2^=ch.codePointAt(0);h2=Math.imul(h2,2654435761)>>>0}
+  return(h.toString(36)+h2.toString(36)).toUpperCase().slice(-6)}
+const sign=r=>hash([SALT,norm(r.name),norm(r.cls),r.quiz,r.score,r.total,r.date].join("|"));
+const message=r=>`LaboQCM | Nom: ${r.name} | Classe: ${r.cls} | Quiz: ${r.quiz} | Note: ${r.score}/${r.total} | Date: ${r.date} | Code: ${r.sig}`;
+function parseMessage(line){
+  if(!/LaboQCM/i.test(line))return null;
+  const g=k=>{const m=line.match(new RegExp("\\b"+k+":\\s*([^|]*)"));return m?m[1].trim():""};
+  const note=g("Note").match(/(\d+)\s*\/\s*(\d+)/);if(!g("Nom")||!note)return null;
+  const r={name:g("Nom"),cls:g("Classe"),quiz:g("Quiz"),score:+note[1],total:+note[2],date:g("Date"),sig:g("Code").toUpperCase()};
+  r.valid=sign(r)===r.sig;return r;
+}
+/* ---------- E-mail du professeur : enregistré par le professeur, transmis aux élèves dans le lien du quiz ("2AC-ADF~xxxx") ---------- */
+const MAIL_RE=/^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']{2,}$/;
+const validMail=m=>typeof m==="string"&&m.length<=80&&MAIL_RE.test(m);
+function encMail(m){try{return btoa(unescape(encodeURIComponent(m))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}catch(e){return""}}
+function decMail(t){try{t=String(t||"").replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";const m=decodeURIComponent(escape(atob(t))).trim().toLowerCase();return validMail(m)?m:""}catch(e){return""}}
+/* Adresse de la page à donner aux élèves : la page publique GitHub Pages (utilisée aussi depuis la page Claude et l'application Android). */
+const SHARE_BASE="https://redabirharassen.github.io/qcm-3ac/";
+const FRAMED=(()=>{try{return window.top!==window.self}catch(e){return true}})();
+const pageBase=()=>(!FRAMED&&/^https?:$/.test(location.protocol))?location.href.split("#")[0]:SHARE_BASE;
+const quizLink=(code,mail)=>pageBase()+"#"+code+(mail?"~"+encMail(mail):"");
+function readHash(){
+  const [c,t]=location.hash.slice(1).split("~");
+  const mail=decMail(t);if(mail)LS.set("lq-tmail",mail);
+  return parseCode(c);
+}
+function mailto(mail,r,msg){
+  const e=encodeURIComponent;
+  return"mailto:"+e(mail).replace(/%40/g,"@")+"?subject="+e(`LaboQCM - ${r.name} - ${r.cls} - Quiz ${r.quiz}`)+"&body="+e(msg);
+}
+/* ---------- Envoi automatique de la note vers la feuille Google Sheets du professeur (application web Apps Script) ---------- */
+const SHEET_URL="https://script.google.com/macros/s/AKfycby6kT10v_2ImO3cWL8AR6fhEYzR0DGGDlIh3r3eJ0zCCqp1J-QGd6tb2g1WisDGLuWnZg/exec";
+const canSend=()=>!!SHEET_URL&&!FRAMED;
+/* Un envoi. Google répond parfois par une page d'erreur alors que la note est bien enregistrée :
+   on renvoie alors la même note, le script la reconnaît (pas de doublon) et confirme. */
+async function postGrade(r){
+  const res=await fetch(SHEET_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({name:r.name,cls:r.cls,quiz:r.quiz,score:r.score,total:r.total,date:r.date,sig:r.sig})});
+  const t=await res.text();try{return JSON.parse(t)}catch(e){return null}
+}
+async function sendGrade(done){
+  if(done.sent)return true;
+  for(let k=0;k<4;k++){
+    if(k)await new Promise(ok=>setTimeout(ok,k*1500));
+    let j=null;try{j=await postGrade(done.rec)}catch(e){}
+    if(j&&j.ok){done.sent=true;LS.set("lq-done-"+done.rec.quiz,done);return true}
+    if(j&&j.error)break;
+  }
+  throw new Error("envoi impossible");
+}
+/* Au démarrage : renvoyer les notes qui n'ont pas pu partir (élève hors connexion à la fin du quiz) */
+function retryPending(){
+  if(!canSend())return;
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);
+    if(k&&k.indexOf("lq-done-")===0){const d=LS.get(k,null);if(d&&d.rec&&d.auto&&!d.sent)sendGrade(d).catch(()=>{})}}}catch(e){}
+}
+function nowStr(){const d=new Date(),p=n=>String(n).padStart(2,"0");return`${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`}
+
+/* ================= ACCUEIL ÉLÈVE ================= */
+function home(){
+  const pre=readHash();
+  const me=LS.get("lq-me",{name:"",cls:""});
+  $app.style.setProperty("--lc","var(--c3)");
+  $app.innerHTML=`
+  <section class="board">
+    <h1>QCM 3AC</h1>
+    <p>Physique-chimie · 3ème année collège. Écris ton nom et le code du quiz donné par ton professeur, puis réponds à ${QN} questions.</p>
+    <div class="formula">ρ = m/V &nbsp; U = R·I</div>
+  </section>
+  <form class="card form" id="f" novalidate>
+    <h2>Passer un quiz</h2>
+    <label for="nm">Nom et prénom</label><input id="nm" maxlength="40" autocomplete="name" value="${esc(me.name)}">
+    <label for="cl">Classe</label><input id="cl" maxlength="15" placeholder="exemple : 3AC-3" value="${esc(me.cls)}">
+    <label for="cd">Code du quiz</label><input id="cd" maxlength="32" placeholder="exemple : 3AC-ADF" autocapitalize="characters" value="${pre?pre.code:""}">
+    <p class="err" id="err" hidden></p>
+    <button class="btn" type="submit">Commencer le quiz</button>
+    ${canSend()?`<p class="muted">À la fin du quiz, ton nom, ta classe et ta note sont envoyés à ton professeur.</p>`:""}
+  </form>
+  <button class="btn ghost" id="train">S'entraîner librement</button>
+  <button class="link" id="prof">Espace professeur</button>
+  ${FRAMED||!/^https?:$/.test(location.protocol)?"":`<a class="link" href="confidentialite.html">Confidentialité</a>`}`;
+  document.getElementById("train").onclick=practiceHome;
+  document.getElementById("prof").onclick=()=>teacher();
+  document.getElementById("f").onsubmit=e=>{
+    e.preventDefault();
+    const name=clean(document.getElementById("nm").value),cls=clean(document.getElementById("cl").value),code=parseCode(document.getElementById("cd").value),err=document.getElementById("err");
+    const fail=t=>{err.textContent=t;err.hidden=false};
+    if(name.length<2)return fail("Écris ton nom et ton prénom.");
+    if(!cls)return fail("Écris ta classe.");
+    if(!code)return fail("Ce code n'existe pas. Vérifie le code écrit par ton professeur (exemple : 2AC-ADF).");
+    LS.set("lq-me",{name,cls});
+    const done=LS.get("lq-done-"+code.code,null);
+    if(done&&norm(done.rec.name)===norm(name))return examResult(done);
+    let run=LS.get("lq-run",null);
+    if(!run||run.quiz!==code.code||norm(run.name)!==norm(name)){
+      run={name,cls,quiz:code.code,level:code.level,qs:toQuestions(poolOf(code.level,code.idx),QN),i:0,picks:[]};
+      LS.set("lq-run",run);
+    }
+    examAsk(run);
+  };
+}
+
+/* ================= QUIZ NOTÉ ================= */
+function examAsk(run){
+  const q=run.qs[run.i],n=run.qs.length;setColor(run.level);let pick=null;
+  $app.innerHTML=`
+  <div class="top"><span class="count">${esc(run.name)}</span><div class="bar"><i style="width:${run.i/n*100}%"></i></div><span class="count">${run.i+1}/${n}</span></div>
+  <section class="question pop"><span class="tag">Quiz ${run.quiz} · ${esc(q.ch)}</span><div class="q">${esc(q.text)}</div></section>
+  <div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="letter">${LETTERS[k]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+  <button class="btn" id="next" disabled>${run.i+1<n?"Valider et continuer":"Valider et terminer"}</button>
+  <p class="muted" style="text-align:center">Choisis une réponse. Tu ne pourras pas revenir en arrière.</p>`;
+  const btns=[...$app.querySelectorAll(".opt")],next=document.getElementById("next");
+  btns.forEach(b=>b.onclick=()=>{pick=+b.dataset.k;btns.forEach(x=>x.classList.toggle("sel",x===b));next.disabled=false});
+  next.onclick=()=>{
+    if(pick==null)return;
+    run.picks[run.i]=q.opts[pick];run.i++;LS.set("lq-run",run);
+    if(run.i<n)return examAsk(run);
+    const score=run.qs.filter((x,k)=>x.answer===run.picks[k]).length;
+    const rec={name:run.name,cls:run.cls,quiz:run.quiz,score,total:n,date:nowStr()};rec.sig=sign(rec);
+    const done={rec,level:run.level,qs:run.qs,picks:run.picks,mail:LS.get("lq-tmail",""),auto:canSend()};
+    LS.set("lq-done-"+run.quiz,done);LS.del("lq-run");examResult(done);
+  };
+}
+function examResult(done){
+  const r=done.rec,s=starsOf(r.score/r.total),msg=message(r);setColor(done.level);
+  const tm=[done.mail,LS.get("lq-tmail","")].find(validMail)||"";
+  const auto=canSend()&&(done.auto||done.sent);
+  $app.innerHTML=`
+  <section class="board result"><span class="label" style="color:var(--boardink);opacity:.85">${esc(r.name)} · ${esc(r.cls)} · Quiz ${r.quiz}</span>
+    <div class="big">${r.score}/${r.total}</div><div class="stars">${starsHTML(s)}</div><p>Terminé le ${esc(r.date)}</p></section>
+  <div class="card"><h2 id="sh">${auto?"Ta note pour ton professeur":"Envoie ta note à ton professeur"}</h2>
+    ${auto?`<div id="sst" aria-live="polite"></div><p class="muted" id="alt" hidden>Tu peux aussi envoyer ta note toi-même :</p>`:""}
+    <div id="manual" style="display:contents"${auto?" hidden":""}>
+    ${tm?`<a class="btn" id="send" href="${esc(mailto(tm,r,msg))}"${FRAMED?' target="_blank" rel="noopener"':""}>Envoyer ma note par e-mail</a>
+    <p class="muted">Ta messagerie s'ouvre avec le message déjà écrit : il reste à appuyer sur « Envoyer ». Si rien ne s'ouvre, copie l'adresse et le message ci-dessous, puis envoie-les toi-même.</p>
+    <div class="row"><span class="label">Adresse du professeur</span></div>
+    <div class="row"><span class="addr" id="tm">${esc(tm)}</span><button class="small-btn ghost" id="cpm">Copier l'adresse</button></div>`
+    :`<p class="muted">Copie ce message et envoie-le à ton professeur (WhatsApp, e-mail…).</p>`}
+    <div class="msg" id="msg">${esc(msg)}</div>
+    <p class="muted">Ne modifie pas le message : sinon il sera refusé.</p>
+    <button class="small-btn" id="cp">Copier le message</button></div></div>
+  <div class="label">Correction</div>
+  <div class="review">${done.qs.map((q,k)=>{const ok=q.answer===done.picks[k];return`<div class="corr ${ok?"":"wrong"}"><b>${k+1}.</b> ${esc(q.text)}<br>
+    ${ok?`<span class="good">✓ ${esc(q.answer)}</span>`:`<span class="you">✗ Ta réponse : ${esc(done.picks[k])}</span><br><span class="good">✓ ${esc(q.answer)}</span>`}<br>${esc(q.exp)}</div>`}).join("")}</div>
+  <button class="btn ghost" id="home">Retour à l'accueil</button>`;
+  document.getElementById("cp").onclick=e=>copyText(msg,e.currentTarget);
+  if(tm)document.getElementById("cpm").onclick=e=>copyText(tm,e.currentTarget);
+  document.getElementById("home").onclick=home;
+  if(auto){
+    const sst=document.getElementById("sst"),manual=document.getElementById("manual"),alt=document.getElementById("alt");
+    const show=state=>{
+      if(!sst.isConnected)return;
+      if(state==="ok"){sst.innerHTML=`<p class="ok-text">✓ Ta note a été envoyée à ton professeur.</p>`;manual.hidden=true;alt.hidden=true}
+      else if(state==="wait"){sst.innerHTML=`<p class="muted">Envoi de ta note à ton professeur…</p>`}
+      else{sst.innerHTML=`<p class="err">La note n'a pas pu être envoyée. Vérifie ta connexion Internet.</p><div class="row"><button class="small-btn" id="retry">Réessayer l'envoi</button></div>`;
+        manual.hidden=false;alt.hidden=false;document.getElementById("retry").onclick=go}
+    };
+    const go=()=>{show("wait");sendGrade(done).then(()=>show("ok"),()=>show("ko"))};
+    done.sent?show("ok"):go();
+  }
+}
+
+/* ================= ESPACE PROFESSEUR ================= */
+let tLevel="3AC",tSel=[],confirmWipe=false,tMailDraft=null,tMailMsg="";
+const mailKey=()=>"lq-mail-"+profUser;
+/* Comptes professeurs : chaque prof crée son compte avec le code d'établissement.
+   Les comptes sont enregistrés sur l'appareil (empreinte SHA-256 salée, jamais le mot de passe). */
+const INVITE_HASH="bfc6fc7c67723e8dac6e5031bad3b1b8b1fe2476753e8efdbb5cecc25aacf7a1";
+let profUser=null,fails=0,lockUntil=0,authMode=null;
+async function sha256(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+const accounts=()=>LS.get("lq-accounts",{});
+const tokenOf=u=>(accounts()[u]||{}).hash;
+const gradesKey=()=>"lq-grades-"+profUser;
+(function restore(){
+  let t=null;try{t=JSON.parse(sessionStorage.getItem("lq-prof")||localStorage.getItem("lq-prof")||"null")}catch(e){}
+  if(t&&t.u&&t.h&&tokenOf(t.u)===t.h)profUser=t.u;
+})();
+function openSession(u,h,keep){
+  profUser=u;fails=0;const t=JSON.stringify({u,h});
+  try{sessionStorage.setItem("lq-prof",t);if(keep)localStorage.setItem("lq-prof",t)}catch(e){}
+  teacher();
+}
+function login(){
+  $app.style.setProperty("--lc","var(--c3)");
+  if(!authMode)authMode=Object.keys(accounts()).length?"in":"new";
+  const isNew=authMode==="new";
+  $app.innerHTML=`
+  <div class="top"><button class="back" id="back">← Accueil</button></div>
+  <section class="board"><h1>Espace professeur</h1><p>Accès réservé aux professeurs. ${isNew?"Créez votre compte avec le code d'établissement.":"Connectez-vous pour créer des quiz et voir les notes de vos élèves."}</p></section>
+  <div class="tabs" style="grid-template-columns:1fr 1fr">
+    <button class="tab" id="m-in" style="--lc:var(--c2)" aria-selected="${!isNew}">Se connecter</button>
+    <button class="tab" id="m-new" style="--lc:var(--c2)" aria-selected="${isNew}">Créer un compte</button></div>
+  <form class="card form" id="lf" novalidate>
+    <label for="lg">Identifiant</label><input id="lg" autocomplete="username" autocapitalize="none" maxlength="30" ${isNew?'placeholder="exemple : m.alaoui"':""}>
+    <label for="pw">Mot de passe</label><input id="pw" type="password" autocomplete="${isNew?"new-password":"current-password"}" maxlength="60">
+    ${isNew?`<label for="pw2">Confirmer le mot de passe</label><input id="pw2" type="password" autocomplete="new-password" maxlength="60">
+    <label for="inv">Code d'établissement</label><input id="inv" autocapitalize="characters" maxlength="20" placeholder="donné par le responsable">`:""}
+    <label class="row" style="margin:0;font-weight:600" for="keep"><input type="checkbox" id="keep" style="width:18px;height:18px"> Rester connecté sur cet appareil</label>
+    <p class="err" id="lerr" hidden></p>
+    <button class="btn" type="submit">${isNew?"Créer mon compte":"Se connecter"}</button>
+    <p class="muted">${isNew?"Le compte est enregistré sur cet appareil. Utilisez toujours le même téléphone ou ordinateur pour retrouver vos notes.":"Pas encore de compte ? Touchez « Créer un compte »."}</p>
+  </form>`;
+  document.getElementById("back").onclick=home;
+  document.getElementById("m-in").onclick=()=>{authMode="in";login()};
+  document.getElementById("m-new").onclick=()=>{authMode="new";login()};
+  document.getElementById("lf").onsubmit=async e=>{
+    e.preventDefault();
+    const err=document.getElementById("lerr"),fail=t=>{err.textContent=t;err.hidden=false};
+    const u=document.getElementById("lg").value.trim().toLowerCase(),pw=document.getElementById("pw").value;
+    const keep=document.getElementById("keep").checked;
+    if(Date.now()<lockUntil)return fail(`Trop d'essais. Réessayez dans ${Math.ceil((lockUntil-Date.now())/1000)} secondes.`);
+    try{
+      if(isNew){
+        if(!/^[a-z0-9._-]{3,30}$/.test(u))return fail("Identifiant : au moins 3 caractères (lettres, chiffres, point, tiret), sans espace.");
+        if(accounts()[u])return fail("Cet identifiant existe déjà sur cet appareil. Choisissez-en un autre.");
+        if(pw.length<6)return fail("Le mot de passe doit avoir au moins 6 caractères.");
+        if(pw!==document.getElementById("pw2").value)return fail("Les deux mots de passe ne sont pas identiques.");
+        const inv=document.getElementById("inv").value.replace(/\s+/g,"").toUpperCase();
+        if(await sha256("laboqcm-invite|"+inv)!==INVITE_HASH){fails++;if(fails>=5){lockUntil=Date.now()+30000;fails=0}return fail("Code d'établissement incorrect. Demandez-le au responsable.")}
+        const salt=[...crypto.getRandomValues(new Uint8Array(8))].map(x=>x.toString(16).padStart(2,"0")).join("");
+        const h=await sha256("laboqcm|"+u+"|"+salt+"|"+pw);
+        const all=accounts();
+        if(!Object.keys(all).length){const old=LS.get("lq-grades",null);if(old)LS.set("lq-grades-"+u,old)} /* reprise des notes de l'ancien compte par défaut */
+        all[u]={salt,hash:h,created:nowStr()};LS.set("lq-accounts",all);
+        authMode="in";return openSession(u,h,keep);
+      }
+      let h=null;
+      const a=accounts()[u];if(a){const x=await sha256("laboqcm|"+u+"|"+a.salt+"|"+pw);if(x===a.hash)h=x}
+      if(h)return openSession(u,h,keep);
+    }catch(x){return fail("La connexion a échoué sur ce navigateur. Essayez avec Chrome.")}
+    fails++;if(fails>=5){lockUntil=Date.now()+30000;fails=0}
+    fail("Identifiant ou mot de passe incorrect.");document.getElementById("pw").value="";
+  };
+}
+function logout(){profUser=null;tMailDraft=null;tMailMsg="";try{sessionStorage.removeItem("lq-prof");localStorage.removeItem("lq-prof")}catch(e){}home()}
+function teacher(){
+  if(!profUser)return login();
+  setColor(tLevel);
+  const L=BANK[tLevel];
+  const code=tSel.length?makeCode(tLevel,tSel):null;
+  const nAvail=tSel.reduce((t,i)=>t+L.chapters[i].qs.length,0);
+  const grades=LS.get(gradesKey(),[]).slice().sort((a,b)=>a.cls.localeCompare(b.cls)||a.name.localeCompare(b.name));
+  const valid=grades.filter(g=>g.valid);
+  const tmail=LS.get(mailKey(),"");const draft=tMailDraft==null?tmail:tMailDraft;
+  const link=code?quizLink(code,tmail):"";
+  const avg=valid.length?(valid.reduce((t,g)=>t+g.score/g.total*10,0)/valid.length).toFixed(1).replace(".",","):"–";
+  $app.innerHTML=`
+  <div class="top" style="justify-content:space-between"><button class="back" id="back">← Accueil</button><span class="row"><span class="count">${esc(profUser)}</span><button class="small-btn ghost" id="logout">Se déconnecter</button></span></div>
+  <section class="board"><h1>Espace professeur</h1><p>Choisissez les leçons pour créer un code de quiz. Chaque élève reçoit ${QN} questions tirées au hasard dans ces leçons.</p></section>
+  <div class="card">
+    <h2>1. Créer un quiz</h2>
+    <div class="tabs">${Object.keys(BANK).map(k=>`<button class="tab" style="--lc:${BANK[k].color}" data-l="${k}" aria-selected="${k===tLevel}">${k}<small>${BANK[k].sub}</small></button>`).join("")}</div>
+    ${L.sems.map((sn,s)=>{const ids=L.chapters.map((c,i)=>c.sem===s?i:-1).filter(i=>i>=0);const all=ids.every(i=>tSel.includes(i));return`
+    <div class="row" style="justify-content:space-between"><span class="label">Semestre ${s+1} · ${esc(sn)}</span><button class="small-btn ghost semall" data-s="${s}">${all?"Tout décocher":"Tout cocher"}</button></div>
+    <div class="checks">${ids.map(i=>{const c=L.chapters[i];return`<label class="check"><input type="checkbox" id="ch-${tLevel}-${i}" data-i="${i}" ${tSel.includes(i)?"checked":""}><span>${i+1}. ${esc(c.name)}</span><small>${c.qs.length} q.</small></label>`}).join("")}</div>`}).join("")}
+    ${code?`<div class="codebox"><div><div class="label" style="color:var(--boardink);opacity:.8">Code à donner aux élèves</div><div class="code">${code}</div></div><button class="small-btn" id="cpcode">Copier le code</button></div>
+      <p class="muted">${nAvail} questions disponibles.${nAvail<QN?` Attention : moins de ${QN}, chaque élève aura ${nAvail} questions. Cochez une autre leçon pour arriver à ${QN}.`:""} Écrivez le code au tableau, ou envoyez ce lien aux élèves : le code sera déjà rempli.</p>
+      <div class="msg" id="lnk">${esc(link)}</div>
+      <div class="row"><button class="small-btn" id="cplink">Copier le lien du quiz</button></div>
+      <p class="muted">${tmail?`Les élèves qui ouvrent ce lien pourront vous envoyer leur note par e-mail à <b>${esc(tmail)}</b>.`:"Enregistrez votre e-mail à l'étape 2 : le lien permettra alors aux élèves de vous envoyer leur note par e-mail."}</p>`
+      :`<p class="muted">Cochez au moins une leçon pour obtenir le code.</p>`}
+  </div>
+  <form class="card form" id="mf" novalidate>
+    <h2>2. Recevoir les notes par e-mail</h2>
+    <p class="muted">Écrivez votre adresse e-mail. À la fin du quiz, l'élève aura un bouton « Envoyer ma note par e-mail » qui vous écrit directement. L'élève ne saisit jamais votre adresse : elle est transmise par le lien du quiz.</p>
+    <label for="tmail">Votre e-mail</label>
+    <div class="inline"><input id="tmail" type="email" inputmode="email" autocomplete="email" autocapitalize="none" maxlength="80" placeholder="exemple : prof@gmail.com" value="${esc(draft)}">
+      <button class="small-btn" type="submit">Enregistrer</button>${tmail?`<button class="small-btn ghost" type="button" id="delmail">Supprimer</button>`:""}</div>
+    <div id="mstatus" aria-live="polite">${tMailMsg}</div>
+    <p class="muted">${tmail?`Adresse enregistrée : <b>${esc(tmail)}</b>. Si vous la changez, renvoyez un nouveau lien aux élèves.`:"Aucune adresse enregistrée : les élèves copient leur message et vous l'envoient eux-mêmes."}</p>
+  </form>
+  <div class="card">
+    <h2>3. Notes des élèves</h2>
+    ${canSend()?`<p class="muted">Les notes des quiz arrivent automatiquement dans la feuille Google Sheets « Labo QCM - Notes », gérée par le responsable de l'application. Le tableau ci-dessous sert aux messages reçus à la main.</p>`:""}
+    <p class="muted">À la fin du quiz, chaque élève peut aussi vous envoyer un message qui commence par « LaboQCM » (par e-mail ou WhatsApp). Collez ici un ou plusieurs messages.</p>
+    <textarea id="paste" rows="4" placeholder="LaboQCM | Nom: … | Classe: … | Quiz: … | Note: …/10 | …"></textarea>
+    <div class="row"><button class="small-btn" id="add">Ajouter les notes</button><span id="status" aria-live="polite"></span></div>
+    ${grades.length?`
+    <div class="summary"><div><b>${grades.length}</b><span>élèves</span></div><div><b>${avg}</b><span>moyenne /10</span></div><div><b>${grades.length-valid.length}</b><span>messages refusés</span></div></div>
+    <div class="tablewrap"><table><thead><tr><th>Nom</th><th>Note</th><th>Classe</th><th>Quiz</th><th>Date</th><th>Contrôle</th></tr></thead><tbody>
+    ${grades.map(g=>`<tr><td>${esc(g.name)}</td><td><b>${g.score}/${g.total}</b></td><td>${esc(g.cls)}</td><td>${esc(g.quiz)}</td><td>${esc(g.date)}</td><td>${g.valid?`<span class="pill ok">valide</span>`:`<span class="pill ko">modifié</span>`}</td></tr>`).join("")}
+    </tbody></table></div>
+    <div class="row"><button class="small-btn ghost" id="cptab">Copier le tableau (Excel)</button>
+      ${confirmWipe?`<span class="muted">Effacer toutes les notes ?</span><button class="small-btn danger" id="wipe2">Oui, effacer</button><button class="small-btn ghost" id="nowipe">Annuler</button>`:`<button class="small-btn ghost" id="wipe">Tout effacer</button>`}</div>
+    <p class="muted">« Modifié » veut dire que le message a été changé après le quiz (nom ou note) : la note n'est pas fiable. Les notes sont gardées seulement dans ce navigateur, sur cet appareil.</p>`
+    :`<p class="muted">Aucune note pour l'instant. Les notes ajoutées s'affichent ici dans un tableau, triées par classe.</p>`}
+  </div>`;
+  document.getElementById("back").onclick=home;
+  document.getElementById("logout").onclick=logout;
+  $app.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{if(b.dataset.l!==tLevel){tLevel=b.dataset.l;tSel=[]}teacher()});
+  $app.querySelectorAll(".semall").forEach(b=>b.onclick=()=>{const s=+b.dataset.s;const ids=L.chapters.map((c,i)=>c.sem===s?i:-1).filter(i=>i>=0);const all=ids.every(i=>tSel.includes(i));tSel=all?tSel.filter(i=>!ids.includes(i)):[...new Set([...tSel,...ids])];teacher()});
+  $app.querySelectorAll(".check input").forEach(c=>c.onchange=()=>{const i=+c.dataset.i;tSel=c.checked?[...tSel,i]:tSel.filter(x=>x!==i);teacher()});
+  if(code){document.getElementById("cpcode").onclick=e=>copyText(code,e.currentTarget);
+    document.getElementById("cplink").onclick=e=>copyText(link,e.currentTarget)}
+  tMailMsg="";
+  document.getElementById("tmail").oninput=e=>{tMailDraft=e.target.value};
+  document.getElementById("mf").onsubmit=e=>{
+    e.preventDefault();
+    const m=document.getElementById("tmail").value.trim().toLowerCase();
+    if(!validMail(m)){document.getElementById("mstatus").innerHTML=`<p class="err">Cette adresse n'est pas valide. Exemple : prof@gmail.com</p>`;return}
+    LS.set(mailKey(),m);tMailDraft=null;tMailMsg=`<p class="ok-text">Adresse enregistrée. Envoyez le lien du quiz (étape 1) aux élèves.</p>`;teacher();
+  };
+  const dm=document.getElementById("delmail");if(dm)dm.onclick=()=>{LS.del(mailKey());tMailDraft=null;tMailMsg=`<p class="ok-text">Adresse supprimée.</p>`;teacher()};
+  document.getElementById("add").onclick=()=>{
+    const lines=document.getElementById("paste").value.split(/\n+/).map(parseMessage).filter(Boolean);
+    const st=document.getElementById("status");
+    if(!lines.length){st.innerHTML=`<span class="err">Aucun message LaboQCM reconnu.</span>`;return}
+    const all=LS.get(gradesKey(),[]);let added=0;
+    lines.forEach(r=>{if(!all.some(g=>g.sig===r.sig&&norm(g.name)===norm(r.name))){all.push(r);added++}});
+    LS.set(gradesKey(),all);teacher();
+    document.getElementById("status").innerHTML=`<span class="ok-text">${added} note${added>1?"s":""} ajoutée${added>1?"s":""}${lines.length-added?` (${lines.length-added} déjà présente${lines.length-added>1?"s":""})`:""}.</span>`;
+  };
+  if(grades.length){
+    document.getElementById("cptab").onclick=e=>copyText(["Nom\tClasse\tQuiz\tNote\tSur\tDate\tContrôle",...grades.map(g=>[g.name,g.cls,g.quiz,g.score,g.total,g.date,g.valid?"valide":"modifié"].join("\t"))].join("\n"),e.currentTarget);
+    const w=document.getElementById("wipe");if(w)w.onclick=()=>{confirmWipe=true;teacher()};
+    const w2=document.getElementById("wipe2");if(w2)w2.onclick=()=>{LS.del(gradesKey());confirmWipe=false;teacher()};
+    const nw=document.getElementById("nowipe");if(nw)nw.onclick=()=>{confirmWipe=false;teacher()};
+  }
+}
+
+/* ================= ENTRAÎNEMENT LIBRE ================= */
+let prefs=LS.get("laboqcm2",{best:{},done:0,level:"3AC"});if(!BANK[prefs.level])prefs.level="3AC";
+const savePrefs=()=>LS.set("laboqcm2",prefs);
+let quiz=null;
+function practiceHome(){
+  const L=BANK[prefs.level];setColor(prefs.level);
+  const bestMix=prefs.best[prefs.level+":mix"];
+  $app.innerHTML=`
+  <div class="top"><button class="back" id="back">← Accueil</button></div>
+  <section class="board"><h1>Entraînement</h1><p>Révise à ton rythme. La correction s'affiche après chaque question. Ces quiz ne sont pas notés.</p></section>
+  <div class="tabs">${Object.keys(BANK).map(k=>`<button class="tab" style="--lc:${BANK[k].color}" data-l="${k}" aria-selected="${k===prefs.level}">${k}<small>${BANK[k].sub}</small></button>`).join("")}</div>
+  <div class="label">Leçons de ${prefs.level}</div>
+  <div class="lessons">
+    <button class="lesson mix" data-c="mix"><span class="num">∑</span><span class="txt"><h3>Toutes les leçons</h3><small>${QN} questions mélangées</small></span><span class="stars">${starsHTML(bestMix!=null?starsOf(bestMix):0)}</span></button>
+    ${L.chapters.map((c,i)=>{const b=prefs.best[prefs.level+":"+i];return`${i===0||L.chapters[i-1].sem!==c.sem?`<div class="label" style="margin-top:8px">Semestre ${c.sem+1} · ${esc(L.sems[c.sem])}</div>`:""}
+    <button class="lesson" data-c="${i}"><span class="num">${i+1}</span><span class="txt"><h3>${esc(c.name)}</h3><small>${c.qs.length} questions${b!=null?` · meilleur : ${Math.round(b*100)} %`:""}</small></span><span class="stars">${starsHTML(b!=null?starsOf(b):0)}</span></button>`}).join("")}
+  </div>`;
+  document.getElementById("back").onclick=home;
+  $app.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{prefs.level=b.dataset.l;savePrefs();practiceHome()});
+  $app.querySelectorAll(".lesson").forEach(b=>b.onclick=()=>pStart(b.dataset.c));
+}
+function pStart(c){
+  const L=BANK[prefs.level];
+  const idx=c==="mix"?L.chapters.map((_,i)=>i):[+c];
+  quiz={key:prefs.level+":"+c,title:c==="mix"?"Toutes les leçons":L.chapters[+c].name,qs:toQuestions(poolOf(prefs.level,idx),QN),i:0,score:0,miss:[]};pAsk();
+}
+function pAsk(){
+  const {qs,i}=quiz,q=qs[i],n=qs.length;
+  $app.innerHTML=`
+  <div class="top"><button class="back" id="back">← Leçons</button><div class="bar"><i style="width:${i/n*100}%"></i></div><span class="count">${i+1}/${n}</span></div>
+  <section class="question pop"><span class="tag">${prefs.level} · ${esc(q.ch)}</span><div class="q">${esc(q.text)}</div></section>
+  <div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}"><span class="letter">${LETTERS[k]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+  <div id="fb" aria-live="polite"></div>
+  <button class="btn" id="next" hidden>${i+1<n?"Question suivante":"Voir mon score"}</button>`;
+  document.getElementById("back").onclick=practiceHome;
+  const btns=[...$app.querySelectorAll(".opt")],fb=document.getElementById("fb"),next=document.getElementById("next");
+  btns.forEach(b=>b.onclick=()=>{
+    const good=q.opts[+b.dataset.k]===q.answer;
+    if(good)quiz.score++;else quiz.miss.push(q);
+    btns.forEach(x=>{x.disabled=true;if(q.opts[+x.dataset.k]===q.answer)x.classList.add("ok")});
+    if(!good)b.classList.add("ko");
+    fb.innerHTML=`<div class="explain ${good?"ok":"ko"} pop"><b>${good?"Bonne réponse !":"Pas tout à fait…"}</b>${esc(q.exp)}</div>`;
+    next.hidden=false;next.focus();
+  });
+  next.onclick=()=>{quiz.i++;quiz.i<n?pAsk():pResult()};
+}
+function pResult(){
+  const {key,title,score,qs,miss}=quiz,n=qs.length,p=score/n,prev=prefs.best[key];
+  const record=prev==null||p>prev;if(record)prefs.best[key]=p;prefs.done++;savePrefs();
+  const s=starsOf(p);
+  const msg=s===3?"Excellent ! Tu maîtrises cette leçon.":s===2?"Très bien ! Encore un effort pour 3 étoiles.":s===1?"C'est un début. Relis ta leçon et rejoue.":"Révise la leçon puis réessaie, tu vas progresser.";
+  $app.innerHTML=`
+  <section class="board result"><span class="label" style="color:var(--boardink);opacity:.8">${prefs.level} · ${esc(title)}</span>
+    <div class="big">${score}/${n}</div><div class="stars">${starsHTML(s)}</div>
+    <p>${msg}${record&&prev!=null?" Nouveau record !":""}</p></section>
+  <div class="actions"><button class="btn" id="again">Rejouer</button><button class="btn ghost" id="menu">Choisir une autre leçon</button></div>
+  ${miss.length?`<div class="label">À revoir (${miss.length})</div><div class="review">${miss.map(q=>`<div class="miss">${esc(q.text)}<br><span class="good">✓ ${esc(q.answer)}</span><br>${esc(q.exp)}</div>`).join("")}</div>`:""}`;
+  document.getElementById("again").onclick=()=>pStart(key.split(":")[1]);
+  document.getElementById("menu").onclick=practiceHome;
+}
+
+/* Reprise automatique d'un quiz noté interrompu (rechargement de la page) */
+readHash();retryPending();
+const pending=LS.get("lq-run",null);
+if(pending&&pending.qs&&pending.i<pending.qs.length)examAsk(pending);else home();
+</script>
+
+</body></html>
