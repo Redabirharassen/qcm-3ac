@@ -144,6 +144,7 @@ a.btn{text-decoration:none}
 .timer{align-self:center;font-family:var(--display);font-size:1.25rem;font-variant-numeric:tabular-nums;padding:4px 16px;border-radius:99px;background:var(--surface);border:2px solid var(--line)}
 .ctx p{margin:0;font-size:.95rem;line-height:1.5}
 .ctx .label{color:var(--lc)}
+.pwcell{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;letter-spacing:.12em}
 .timer.low{border-color:var(--bad);color:var(--bad)}
 </style>
 
@@ -257,6 +258,13 @@ function parseCode(c){
   const n=idx.reduce((t,i)=>t+nQ(L.chapters[i]),0);
   return{level:"3AC",idx,cls,dur,day,start,end,n,code:fmtCode(s),open:localAt(day,start),close:localAt(day,end)};
 }
+/* ---------- Comptes élèves : mot de passe personnel généré à partir du nom et de la classe ---------- */
+const PW_SECRET="QCM3AC-DE65FB0721CDD9DF";
+const PWA="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+function pwOf(cls,name){let h=2166136261>>>0,out="";const s=PW_SECRET+"|"+cls+"|"+nkey(name);
+  for(let r=0;r<6;r++){for(const ch of s+"#"+r){h^=ch.codePointAt(0);h=Math.imul(h,16777619)>>>0}out+=PWA[h%PWA.length]}
+  return out}
+const normPw=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
 const quizInfo=q=>`${dayLabel(q.day)}, de ${hm(q.start)} à ${hm(q.end)} · durée ${q.dur} min · ${q.cls.join(", ")}`;
 /* ---------- Signature des résultats (empêche de modifier la note dans le message) ---------- */
 function hash(s){let h=2166136261;for(const ch of s){h^=ch.codePointAt(0);h=Math.imul(h,16777619)>>>0}
@@ -337,6 +345,8 @@ function home(){
     <div id="qinfo" aria-live="polite"></div>
     <label for="cl">Classe</label><select id="cl"></select>
     <label for="nm">Nom et prénom</label><input id="nm" maxlength="60" autocomplete="off" autocapitalize="characters" spellcheck="false" list="names" placeholder="comme sur Massar, exemple : ARABI MALAK" value="${esc(me.name)}"><datalist id="names"></datalist>
+    <label for="spw">Mot de passe</label><input id="spw" type="password" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="donné par ton professeur (6 caractères)">
+    <label class="row" style="margin:0;font-weight:600" for="spwshow"><input type="checkbox" id="spwshow" style="width:18px;height:18px"> Afficher le mot de passe</label>
     <p class="err" id="err" hidden></p>
     <button class="btn" type="submit">Commencer le quiz</button>
     ${canSend()?`<p class="muted">À la fin du quiz, ton nom, ta classe et ta note sont envoyés à ton professeur.</p>`:""}
@@ -357,6 +367,7 @@ function home(){
     info.innerHTML=`<p class="muted">Quiz du ${esc(quizInfo(q))} ${st}</p>`;
   };
   cd.oninput=fill;cl.onchange=()=>{err.hidden=true;fill()};
+  byId("spwshow").onchange=e=>{byId("spw").type=e.target.checked?"text":"password"};
   fill();
   byId("f").onsubmit=e=>{
     e.preventDefault();
@@ -368,6 +379,8 @@ function home(){
     if(clean(nm.value).length<2)return fail("Écris ton nom et ton prénom.");
     const stu=findStudent(nm.value,[cl.value]);
     if(!stu)return fail(`Ce nom n'est pas dans la liste de la ${cl.value}. Écris ton nom comme sur Massar (exemple : ${CLASSES[cl.value][0]}), ou choisis-le dans les suggestions.`);
+    if(!normPw(byId("spw").value))return fail("Écris ton mot de passe.");
+    if(normPw(byId("spw").value)!==pwOf(stu.cls,stu.name))return fail("Mot de passe incorrect. Vérifie-le sur ton coupon, ou demande-le à ton professeur.");
     LS.set("lq-me",{name:stu.name,cls:stu.cls});
     const done=LS.get("lq-done-"+q.code,null);
     if(done&&nkey(done.rec.name)===nkey(stu.name))return examResult(done);
@@ -464,7 +477,7 @@ function examResult(done){
 
 /* ================= ESPACE PROFESSEUR ================= */
 let tLevel="3AC",tSel=[],confirmWipe=false,tMailDraft=null,tMailMsg="";
-let tSheetMsg="";
+let tSheetMsg="",tAcc="3AC1";
 let tCls=["3AC1","3AC2"],tDur="20",tDay=null,tT1=null,tT2=null,tView="3AC1",tQuiz="";
 const mailKey=()=>"lq-mail-"+profUser;
 /* Comptes professeurs : chaque prof crée son compte avec le code d'établissement.
@@ -653,6 +666,17 @@ function teacher(){
     ${extra.length?`<p class="muted">${extra.length} note${extra.length>1?"s":""} avec un nom absent des listes : ${extra.slice(0,5).map(g=>esc(g.name)).join(", ")}${extra.length>5?"…":""}</p>`:""}
     ${grades.length?`<div class="row">${confirmWipe?`<span class="muted">Effacer toutes les notes ?</span><button class="small-btn danger" id="wipe2">Oui, effacer</button><button class="small-btn ghost" id="nowipe">Annuler</button>`:`<button class="small-btn ghost" id="wipe">Effacer toutes les notes</button>`}</div>`:""}
     <p class="muted">« Modifié » veut dire que le message a été changé après le quiz : la note n'est pas fiable. Les notes ajoutées sont gardées sur cet appareil.</p>
+  </div>
+  <div class="card">
+    <h2>4. Comptes des élèves</h2>
+    <p class="muted">Pour passer un quiz, chaque élève choisit sa classe, écrit son nom et son mot de passe personnel (6 caractères). Les mots de passe sont générés par l'application : distribuez-les avec le PDF (liste de la classe + coupons à découper).</p>
+    <div class="form settings"><div class="field"><label for="acls">Classe</label><select id="acls">${CLS.map(c=>`<option value="${c}"${c===tAcc?" selected":""}>${c} (${CLASSES[c].length} élèves)</option>`).join("")}</select></div></div>
+    <div class="row"><button class="small-btn" id="pdf1">PDF de la ${tAcc}</button><button class="small-btn ghost" id="pdfall">PDF de toutes les classes</button></div>
+    <div id="pdfst" aria-live="polite"></div>
+    <div class="tablewrap"><table><thead><tr><th>N°</th><th>Nom et prénom</th><th>Mot de passe</th></tr></thead><tbody>
+    ${CLASSES[tAcc].map((n,i)=>`<tr><td>${i+1}</td><td>${esc(n)}</td><td class="pwcell">${pwOf(tAcc,n)}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="muted">Un élève a oublié son mot de passe ? Retrouvez-le dans ce tableau.</p>
   </div>`;
   byId("back").onclick=home;
   byId("logout").onclick=logout;
@@ -711,6 +735,65 @@ function teacher(){
   const w=byId("wipe");if(w)w.onclick=()=>{confirmWipe=true;teacher()};
   const w2=byId("wipe2");if(w2)w2.onclick=()=>{LS.del(gradesKey());confirmWipe=false;tQuiz="";teacher()};
   const nw=byId("nowipe");if(nw)nw.onclick=()=>{confirmWipe=false;teacher()};
+  byId("acls").onchange=e=>{tAcc=e.target.value;teacher()};
+  const runPdf=async(classes,btn)=>{const st=byId("pdfst");btn.disabled=true;st.innerHTML=`<p class="muted">Préparation du PDF…</p>`;
+    try{const r=await accountsPdf(classes);
+      st.innerHTML=String(r).startsWith("ERREUR")?`<p class="err">Le PDF n'a pas pu être enregistré (${esc(r)}).</p>`
+        :`<p class="ok-text">PDF enregistré : ${esc(r)}</p>`}
+    catch(x){st.innerHTML=`<p class="err">Le PDF n'a pas pu être créé. Vérifiez votre connexion et réessayez.</p>`}
+    btn.disabled=false};
+  byId("pdf1").onclick=e=>runPdf([tAcc],e.currentTarget);
+  byId("pdfall").onclick=e=>runPdf(CLS,e.currentTarget);
+}
+
+/* ---------- PDF des comptes élèves (jsPDF chargé à la demande) ---------- */
+function loadJsPDF(){return window.jspdf?Promise.resolve():new Promise((ok,ko)=>{const s=document.createElement("script");s.src="jspdf.umd.min.js";s.onload=ok;s.onerror=()=>ko(new Error("jsPDF"));document.head.appendChild(s)})}
+function buildAccountsPdf(classes,prof,dateStr){
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:"mm",format:"a4"});
+  const W=210,M=15,green=[34,70,61],chalk=[245,223,114];
+  let first=true;
+  const header=(title,sub)=>{if(!first)doc.addPage();first=false;
+    doc.setFillColor(...green);doc.rect(0,0,W,24,"F");
+    doc.setTextColor(...chalk);doc.setFont("helvetica","bold");doc.setFontSize(17);doc.text(title,M,11);
+    doc.setTextColor(242,246,243);doc.setFont("helvetica","normal");doc.setFontSize(9.5);doc.text(sub,M,18);
+    doc.setTextColor(27,42,38)};
+  classes.forEach(c=>{
+    const list=CLASSES[c];
+    header("QCM 3AC - Comptes des élèves - "+c,`Physique-chimie · ${list.length} élèves · généré le ${dateStr}${prof?" · professeur : "+prof:""}`);
+    let y=34;doc.setFontSize(9.5);doc.setTextColor(90,109,103);
+    doc.text("Pour passer un quiz : code du quiz, classe, nom et prénom, puis le mot de passe ci-dessous.",M,y-3);
+    const cols=[[M,12,"N°"],[M+12,118,"Nom et prénom"],[M+130,50,"Mot de passe"]];const rh=7.2;
+    doc.setFillColor(237,242,240);doc.rect(M,y,180,rh,"F");doc.setFont("helvetica","bold");doc.setTextColor(27,42,38);
+    cols.forEach(([x,,t])=>doc.text(t,x+2,y+5));y+=rh;
+    doc.setFont("helvetica","normal");
+    list.forEach((n,i)=>{if(i%2){doc.setFillColor(248,250,249);doc.rect(M,y,180,rh,"F")}
+      doc.setFontSize(10);doc.text(String(i+1),M+2,y+5);doc.text(n,M+14,y+5);
+      doc.setFont("courier","bold");doc.setFontSize(12);doc.text(pwOf(c,n).split("").join(" "),M+132,y+5.1);doc.setFont("helvetica","normal");
+      y+=rh});
+    doc.setDrawColor(210,220,216);doc.setLineWidth(.2);doc.rect(M,34,180,y-34);
+    doc.line(M+12,34,M+12,y);doc.line(M+130,34,M+130,y);
+    doc.setFontSize(8.5);doc.setTextColor(90,109,103);doc.text("Document confidentiel : à conserver par le professeur.",M,287);
+    /* coupons : 2 colonnes x 8 lignes par page */
+    const cw=90,ch=33,gx=0,per=16;
+    for(let p=0;p*per<list.length;p++){
+      header("QCM 3AC - Coupons à découper - "+c,`Distribuez à chaque élève son coupon · page ${p+1}/${Math.ceil(list.length/per)}`);
+      list.slice(p*per,p*per+per).forEach((n,k)=>{const i=p*per+k,x=M+(k%2)*cw,yy=30+Math.floor(k/2)*ch;
+        doc.setLineDashPattern([1.5,1.5],0);doc.setDrawColor(150,160,156);doc.rect(x,yy,cw,ch);doc.setLineDashPattern([],0);
+        doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(34,70,61);doc.text(`QCM 3AC · ${c} · N° ${i+1}`,x+4,yy+6);
+        doc.setFontSize(10.5);doc.setTextColor(27,42,38);doc.text(doc.splitTextToSize(n,cw-8)[0],x+4,yy+13);
+        doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(90,109,103);doc.text("Mot de passe :",x+4,yy+21);
+        doc.setFont("courier","bold");doc.setFontSize(15);doc.setTextColor(27,42,38);doc.text(pwOf(c,n).split("").join(" "),x+28,yy+21.5);
+        doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(90,109,103);doc.text("Garde ce mot de passe pour toi. Ne le donne à personne.",x+4,yy+28)});
+    }
+  });
+  return doc;
+}
+async function accountsPdf(classes){
+  await loadJsPDF();
+  const doc=buildAccountsPdf(classes,profUser||"",nowStr().split(" ")[0]);
+  const name="QCM3AC-comptes-"+(classes.length>1?"toutes-les-classes":classes[0])+".pdf";
+  if(window.Android&&Android.savePdf)return Android.savePdf(name,doc.output("datauristring").split(",")[1]);
+  doc.save(name);return "Téléchargements/"+name;
 }
 
 /* ================= ENTRAÎNEMENT LIBRE ================= */
