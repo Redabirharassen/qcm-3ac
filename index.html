@@ -1,7 +1,7 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <title>QCM 3AC</title>
 <meta name="description" content="QCM de physique-chimie pour la 3ème année collège (3AC) : 17 leçons, entraînement et quiz notés.">
-<meta name="theme-color" content="#22463d">
+<meta name="theme-color" content="#0b4fd6">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2322463d'/%3E%3Ctext x='32' y='42' font-family='Arial' font-weight='700' font-size='22' text-anchor='middle' fill='%23f5df72'%3E3AC%3C/text%3E%3C/svg%3E">
 </head><body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,18 +9,13 @@
 <style>
 /* Layout: une colonne type téléphone ; accueil = tableau noir + onglets de niveau + liste des leçons ; quiz = énoncé au tableau, réponses A–D empilées */
 :root{
-  --bg:#edf2f0; --surface:#ffffff; --ink:#1b2a26; --muted:#5a6d67; --line:#d2dcd8;
-  --board:#22463d; --boardink:#f2f6f3; --chalk:#f5df72; --good:#2e8b57; --bad:#c2453b;
-  --c1:#e3a93b; --c2:#4f9cc4; --c3:#d26f55;
+  --bg:#ffffff; --surface:#ffffff; --soft:#eef4ff; --ink:#0f1b2d; --muted:#4a5a70; --line:#d3dded;
+  --board:#0b4fd6; --boardink:#ffffff; --chalk:#ffd400; --good:#12a150; --bad:#e11d2e;
+  --c1:#ffb300; --c2:#00a3ff; --c3:#ff6b00; --dark:#0f1b2d;
   --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
   --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#121e1b; --surface:#1b2b27; --ink:#e8f0ed; --muted:#9db1aa; --line:#2e443e;
-  --board:#295449; --good:#5cc286; --bad:#ec7a6f; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#121e1b; --surface:#1b2b27; --ink:#e8f0ed; --muted:#9db1aa; --line:#2e443e;
-  --board:#295449; --good:#5cc286; --bad:#ec7a6f; color-scheme:dark}
+:root{color-scheme:light}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;padding:16px;padding-block:16px 32px}
 .app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
@@ -37,17 +32,17 @@ button{font:inherit}
 .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .tab{all:unset;cursor:pointer;text-align:center;padding:10px 4px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-family:var(--display);font-size:1.25rem;line-height:1.1}
 .tab small{display:block;font-family:var(--body);font-size:.72rem;color:var(--muted);font-weight:700}
-.tab[aria-selected="true"]{background:var(--lc);border-color:var(--lc);color:#1b2a26}
-.tab[aria-selected="true"] small{color:#1b2a26}
+.tab[aria-selected="true"]{background:var(--lc);border-color:var(--lc);color:var(--dark)}
+.tab[aria-selected="true"] small{color:var(--dark)}
 .tab:focus-visible,.lesson:focus-visible,.opt:focus-visible,.btn:focus-visible,.back:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
 .lessons{display:flex;flex-direction:column;gap:10px}
 .lesson{all:unset;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:12px 14px;transition:border-color .15s,transform .15s}
 .lesson:hover{border-color:var(--lc);transform:translateX(2px)}
-.lesson .num{width:40px;height:40px;border-radius:12px;background:var(--lc);color:#1b2a26;display:grid;place-items:center;font-family:var(--display);font-size:1.15rem}
+.lesson .num{width:40px;height:40px;border-radius:12px;background:var(--lc);color:var(--dark);display:grid;place-items:center;font-family:var(--display);font-size:1.15rem}
 .lesson .txt{min-width:0}
 .lesson h3{font-size:1.08rem}
 .lesson small{color:var(--muted);font-size:.85rem}
-.lesson.mix{background:var(--board);border-color:var(--board);color:var(--boardink)}
+.lesson.mix{background:var(--dark);border-color:var(--dark);color:#fff}
 .lesson.mix small{color:var(--boardink);opacity:.8}
 .lesson.mix .num{background:var(--chalk)}
 .stars{color:var(--c1);letter-spacing:1px;white-space:nowrap}
@@ -65,7 +60,7 @@ button{font:inherit}
 .opts{display:flex;flex-direction:column;gap:10px}
 .opt{all:unset;cursor:pointer;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:700;min-width:0}
 .opt span:last-child{min-width:0;overflow-wrap:anywhere}
-.opt .letter{width:34px;height:34px;border-radius:10px;background:var(--bg);display:grid;place-items:center;font-family:var(--display);color:var(--muted)}
+.opt .letter{width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center;font-family:var(--display);color:var(--muted)}
 .opt:hover:not(:disabled){border-color:var(--lc)}
 .opt:disabled{cursor:default}
 .opt.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--surface))}
@@ -76,7 +71,7 @@ button{font:inherit}
 .explain.ok{border-color:var(--good)} .explain.ko{border-color:var(--bad)}
 .explain b{display:block;font-family:var(--display);font-size:1.1rem}
 .explain.ok b{color:var(--good)} .explain.ko b{color:var(--bad)}
-.btn{all:unset;cursor:pointer;text-align:center;background:var(--ink);color:var(--bg);padding:14px;border-radius:14px;font-family:var(--display);font-size:1.15rem}
+.btn{all:unset;cursor:pointer;text-align:center;background:var(--board);color:#fff;padding:14px;border-radius:14px;font-family:var(--display);font-size:1.15rem}
 .btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
 .result{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
 .result .big{font-family:var(--display);font-size:4rem;line-height:1;color:var(--chalk);font-variant-numeric:tabular-nums}
@@ -92,7 +87,7 @@ button{font:inherit}
 .card{background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .card h2{font-size:1.3rem}
 .form label{font-weight:800;font-size:.9rem;margin-bottom:-6px}
-.form input,textarea{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
+.form input,textarea{font:inherit;color:var(--ink);background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
 .form input:focus,textarea:focus{outline:none;border-color:var(--c2)}
 .err{color:var(--bad);font-weight:700;margin:0}
 .ok-text{color:var(--good);font-weight:700;margin:0}
@@ -100,7 +95,7 @@ button{font:inherit}
 .link{all:unset;cursor:pointer;color:var(--muted);font-weight:700;text-decoration:underline;text-underline-offset:3px;text-align:center;padding:6px}
 .link:focus-visible{outline:3px solid var(--c2)}
 .opt.sel{border-color:var(--lc);background:color-mix(in srgb,var(--lc) 18%,var(--surface))}
-.opt.sel .letter{background:var(--lc);color:#1b2a26}
+.opt.sel .letter{background:var(--lc);color:var(--dark)}
 .btn:disabled{opacity:.45;cursor:default}
 .checks{display:flex;flex-direction:column;gap:8px}
 .check{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border:2px solid var(--line);border-radius:12px;cursor:pointer}
@@ -109,23 +104,23 @@ button{font:inherit}
 .check small{color:var(--muted);white-space:nowrap}
 .codebox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--board);color:var(--boardink);border-radius:14px;padding:14px 16px}
 .codebox .code{font-family:var(--display);font-size:2rem;color:var(--chalk);letter-spacing:.04em;line-height:1}
-.small-btn{all:unset;cursor:pointer;font-weight:800;font-size:.9rem;padding:8px 14px;border-radius:10px;background:var(--ink);color:var(--bg);text-align:center}
-.codebox .small-btn{background:var(--chalk);color:#1b2a26}
+.small-btn{all:unset;cursor:pointer;font-weight:800;font-size:.9rem;padding:8px 14px;border-radius:10px;background:var(--board);color:#fff;text-align:center}
+.codebox .small-btn{background:var(--chalk);color:var(--dark)}
 .small-btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
 .small-btn.danger{background:var(--bad);color:#fff}
 .small-btn:focus-visible{outline:3px solid var(--c2);outline-offset:2px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.msg{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:10px;overflow-wrap:anywhere;user-select:all}
+.msg{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;background:var(--soft);border:1px dashed var(--line);border-radius:10px;padding:10px;overflow-wrap:anywhere;user-select:all}
 .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
 table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--bg)}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--soft)}
 tr:last-child td{border-bottom:0}
 .pill{display:inline-block;font-size:.75rem;font-weight:800;padding:2px 8px;border-radius:99px}
 .pill.ok{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
 .pill.ko{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
 .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.summary div{background:var(--bg);border-radius:12px;padding:10px;text-align:center}
+.summary div{background:var(--soft);border-radius:12px;padding:10px;text-align:center}
 .summary b{display:block;font-family:var(--display);font-size:1.5rem;line-height:1.1;font-variant-numeric:tabular-nums}
 .summary span{font-size:.75rem;color:var(--muted);font-weight:700}
 .corr{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--good);border-radius:10px;padding:10px 12px;font-size:.92rem}
@@ -136,7 +131,7 @@ a.btn{text-decoration:none}
 .addr{font-weight:800;overflow-wrap:anywhere;user-select:all}
 .inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .inline input{flex:1 1 200px}
-.form select{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
+.form select{font:inherit;color:var(--ink);background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
 .form select:focus{outline:none;border-color:var(--c2)}
 .settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .settings .field{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -750,40 +745,40 @@ function teacher(){
 function loadJsPDF(){return window.jspdf?Promise.resolve():new Promise((ok,ko)=>{const s=document.createElement("script");s.src="jspdf.umd.min.js";s.onload=ok;s.onerror=()=>ko(new Error("jsPDF"));document.head.appendChild(s)})}
 function buildAccountsPdf(classes,prof,dateStr){
   const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:"mm",format:"a4"});
-  const W=210,M=15,green=[34,70,61],chalk=[245,223,114];
+  const W=210,M=15,green=[11,79,214],chalk=[255,212,0];
   let first=true;
   const header=(title,sub)=>{if(!first)doc.addPage();first=false;
     doc.setFillColor(...green);doc.rect(0,0,W,24,"F");
     doc.setTextColor(...chalk);doc.setFont("helvetica","bold");doc.setFontSize(17);doc.text(title,M,11);
     doc.setTextColor(242,246,243);doc.setFont("helvetica","normal");doc.setFontSize(9.5);doc.text(sub,M,18);
-    doc.setTextColor(27,42,38)};
+    doc.setTextColor(15,27,45)};
   classes.forEach(c=>{
     const list=CLASSES[c];
     header("QCM 3AC - Comptes des élèves - "+c,`Physique-chimie · ${list.length} élèves · généré le ${dateStr}${prof?" · professeur : "+prof:""}`);
-    let y=34;doc.setFontSize(9.5);doc.setTextColor(90,109,103);
+    let y=34;doc.setFontSize(9.5);doc.setTextColor(74,90,112);
     doc.text("Pour passer un quiz : code du quiz, classe, nom et prénom, puis le mot de passe ci-dessous.",M,y-3);
     const cols=[[M,12,"N°"],[M+12,118,"Nom et prénom"],[M+130,50,"Mot de passe"]];const rh=7.2;
-    doc.setFillColor(237,242,240);doc.rect(M,y,180,rh,"F");doc.setFont("helvetica","bold");doc.setTextColor(27,42,38);
+    doc.setFillColor(238,244,255);doc.rect(M,y,180,rh,"F");doc.setFont("helvetica","bold");doc.setTextColor(15,27,45);
     cols.forEach(([x,,t])=>doc.text(t,x+2,y+5));y+=rh;
     doc.setFont("helvetica","normal");
-    list.forEach((n,i)=>{if(i%2){doc.setFillColor(248,250,249);doc.rect(M,y,180,rh,"F")}
+    list.forEach((n,i)=>{if(i%2){doc.setFillColor(247,250,255);doc.rect(M,y,180,rh,"F")}
       doc.setFontSize(10);doc.text(String(i+1),M+2,y+5);doc.text(n,M+14,y+5);
       doc.setFont("courier","bold");doc.setFontSize(12);doc.text(pwOf(c,n).split("").join(" "),M+132,y+5.1);doc.setFont("helvetica","normal");
       y+=rh});
-    doc.setDrawColor(210,220,216);doc.setLineWidth(.2);doc.rect(M,34,180,y-34);
+    doc.setDrawColor(211,221,237);doc.setLineWidth(.2);doc.rect(M,34,180,y-34);
     doc.line(M+12,34,M+12,y);doc.line(M+130,34,M+130,y);
-    doc.setFontSize(8.5);doc.setTextColor(90,109,103);doc.text("Document confidentiel : à conserver par le professeur.",M,287);
+    doc.setFontSize(8.5);doc.setTextColor(74,90,112);doc.text("Document confidentiel : à conserver par le professeur.",M,287);
     /* coupons : 2 colonnes x 8 lignes par page */
     const cw=90,ch=33,gx=0,per=16;
     for(let p=0;p*per<list.length;p++){
       header("QCM 3AC - Coupons à découper - "+c,`Distribuez à chaque élève son coupon · page ${p+1}/${Math.ceil(list.length/per)}`);
       list.slice(p*per,p*per+per).forEach((n,k)=>{const i=p*per+k,x=M+(k%2)*cw,yy=30+Math.floor(k/2)*ch;
         doc.setLineDashPattern([1.5,1.5],0);doc.setDrawColor(150,160,156);doc.rect(x,yy,cw,ch);doc.setLineDashPattern([],0);
-        doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(34,70,61);doc.text(`QCM 3AC · ${c} · N° ${i+1}`,x+4,yy+6);
-        doc.setFontSize(10.5);doc.setTextColor(27,42,38);doc.text(doc.splitTextToSize(n,cw-8)[0],x+4,yy+13);
-        doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(90,109,103);doc.text("Mot de passe :",x+4,yy+21);
-        doc.setFont("courier","bold");doc.setFontSize(15);doc.setTextColor(27,42,38);doc.text(pwOf(c,n).split("").join(" "),x+28,yy+21.5);
-        doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(90,109,103);doc.text("Garde ce mot de passe pour toi. Ne le donne à personne.",x+4,yy+28)});
+        doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(11,79,214);doc.text(`QCM 3AC · ${c} · N° ${i+1}`,x+4,yy+6);
+        doc.setFontSize(10.5);doc.setTextColor(15,27,45);doc.text(doc.splitTextToSize(n,cw-8)[0],x+4,yy+13);
+        doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(74,90,112);doc.text("Mot de passe :",x+4,yy+21);
+        doc.setFont("courier","bold");doc.setFontSize(15);doc.setTextColor(15,27,45);doc.text(pwOf(c,n).split("").join(" "),x+28,yy+21.5);
+        doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(74,90,112);doc.text("Garde ce mot de passe pour toi. Ne le donne à personne.",x+4,yy+28)});
     }
   });
   return doc;
